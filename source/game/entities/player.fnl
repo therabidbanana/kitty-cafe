@@ -12,7 +12,8 @@
    dirs {:down 0
          :up (* 1 sprite-count)
          :left (* 3 sprite-count)
-         :right (* 2 sprite-count)}]
+         :right (* 2 sprite-count)}
+   ]
 
   (fn react! [{: state : height : x : y : width &as self}]
     (if (justpressed? playdate.kButtonLeft) (self:->left!)
