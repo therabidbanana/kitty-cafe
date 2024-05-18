@@ -7,7 +7,12 @@
    $ui (require :source.lib.ui)
    tile (require :source.lib.behaviors.tile-movement)
    scene-manager (require :source.lib.scene-manager)
-   anim (require :source.lib.animation)]
+   anim (require :source.lib.animation)
+   sprite-count 6
+   dirs {:down 0
+         :up (* 1 sprite-count)
+         :left (* 3 sprite-count)
+         :right (* 2 sprite-count)}]
 
   (fn react! [{: state : height : x : y : width &as self}]
     (if (justpressed? playdate.kButtonLeft) (self:->left!)
@@ -40,13 +45,14 @@
       )
     self)
 
-  (fn update [{:state {: animation : dx : dy : walking?} &as self}]
+  (fn update [{:state {: animation : dx : dy : walking? &as state} &as self}]
     (let [target-x (+ dx self.x)
           target-y (+ dy self.y)
           (x y collisions count) (self:moveWithCollisions target-x target-y)]
       (if walking?
-         (animation:transition! :walking)
-         (animation:transition! :standing {:if :walking})))
+         (animation:transition! (.. state.facing "." :walking ))
+         (animation:transition! (.. state.facing "." :standing)
+                                {:if (.. state.facing "." :walking)})))
     (self:markDirty)
     )
 
@@ -57,11 +63,53 @@
     (other:collisionResponse))
 
   (fn new! [x y {: tile-w : tile-h}]
-    (let [image (gfx.imagetable.new :assets/images/pineapple-walk)
-          animation (anim.new {: image :states [{:state :standing :start 1 :end 1 :delay 2300 :transition-to :blinking}
-                                                {:state :blinking :start 2 :end 3 :delay 300 :transition-to :pace}
-                                                {:state :pace :start 4 :end 5 :delay 500 :transition-to :standing}
-                                                {:state :walking :start 4 :end 5}]})
+    (let [image (gfx.imagetable.new :assets/images/princess)
+          animation (anim.new {: image :states [
+          {:state :down.standing
+           :start (+ 1 dirs.down) :end (+ 1 dirs.down)
+           :delay 2300 :transition-to :down.blinking}
+          {:state :down.blinking
+           :start (+ 3 dirs.down) :end (+ 3 dirs.down)
+           :delay 300 :transition-to :down.pace}
+          {:state :down.pace
+           :start (+ 1 dirs.down) :end (+ 2 dirs.down)
+           :delay 500 :transition-to :down.standing}
+          {:state :down.walking
+           :start (+ 4 dirs.down) :end (+ 6 dirs.down)}
+          {:state :up.standing
+           :start (+ 1 dirs.up) :end (+ 1 dirs.up)
+           :delay 2300 :transition-to :up.blinking}
+          {:state :up.blinking
+           :start (+ 3 dirs.up) :end (+ 3 dirs.up)
+           :delay 300 :transition-to :up.pace}
+          {:state :up.pace
+           :start (+ 1 dirs.up) :end (+ 2 dirs.up)
+           :delay 500 :transition-to :up.standing}
+          {:state :up.walking
+           :start (+ 4 dirs.up) :end (+ 6 dirs.up)}
+          {:state :left.standing
+           :start (+ 1 dirs.left) :end (+ 1 dirs.left)
+           :delay 2300 :transition-to :left.blinking}
+          {:state :left.blinking
+           :start (+ 3 dirs.left) :end (+ 3 dirs.left)
+           :delay 300 :transition-to :left.pace}
+          {:state :left.pace
+           :start (+ 1 dirs.left) :end (+ 2 dirs.left)
+           :delay 500 :transition-to :left.standing}
+          {:state :left.walking
+           :start (+ 4 dirs.left) :end (+ 6 dirs.left)}
+          {:state :right.standing
+           :start (+ 1 dirs.right) :end (+ 1 dirs.right)
+           :delay 2300 :transition-to :right.blinking}
+          {:state :right.blinking
+           :start (+ 3 dirs.right) :end (+ 3 dirs.right)
+           :delay 300 :transition-to :right.pace}
+          {:state :right.pace
+           :start (+ 1 dirs.right) :end (+ 2 dirs.right)
+           :delay 500 :transition-to :right.standing}
+          {:state :right.walking
+           :start (+ 4 dirs.right) :end (+ 6 dirs.right)}
+          ]})
           player (gfx.sprite.new)]
       (player:setCenter 0 0)
       (player:setBounds x y 32 32)
@@ -71,7 +119,7 @@
       (tset player :draw draw)
       (tset player :update update)
       (tset player :react! react!)
-      (tset player :state {: animation :speed 2 :dx 0 :dy 0 :visible true})
+      (tset player :state {:facing :down : animation :speed 2 :dx 0 :dy 0 :visible true})
       (tile.add! player {: tile-h : tile-w})
       player)))
 
