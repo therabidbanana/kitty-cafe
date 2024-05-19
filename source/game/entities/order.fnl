@@ -1,5 +1,6 @@
 (import-macros {: inspect : defns} :source.lib.macros)
 
+;; TODO: rename 'register'
 (defns :order
   [gfx playdate.graphics
    scene-manager (require :source.lib.scene-manager)

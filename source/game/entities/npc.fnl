@@ -14,20 +14,55 @@
          :right (* 2 sprite-count)}
    ]
 
-  (fn react! [{: state : height : x : y : tile-w : tile-h : width &as self}]
-    
-    (let [(dx dy) (self:tile-movement-react! state.speed)]
-      ;; (if (and (= dx 0) (= dy 0))
-      ;;     (case (math.random 0 100)
-      ;;       1 (self:->left!)
-      ;;       2 (self:->right!)
-      ;;       3 (self:->up!)
-      ;;       4 (self:->down!)
-      ;;       _ nil))
-      (tset self :state :dx dx)
-      (tset self :state :dy dy)
-      (tset self :state :walking? (not (and (= 0 dx) (= 0 dy))))
-      )
+  (fn plan-next-step [state {: graph : graph-locations : grid-w}]
+    (let [goal (case state.state
+                 :order (?. graph-locations :wait)
+                 :leave (?. graph-locations :exit)
+                 _ nil)
+          ;; TODO: XY on nodes seems +1 each way. coords 1 based?
+          curr (if goal (graph:nodeWithID (+ (* grid-w state.tile-y) (+ state.tile-x 1))))
+          ;; curr (if goal (graph:nodeWithXY (+ (inspect state.tile-y) 1) (+ (inspect state.tile-x) 1)))
+          path (if curr (graph:findPath curr goal))
+          ;; _ (inspect {:x curr.x :y curr.y})
+          ;; _ (inspect (curr:connectedNodes))
+          ;; _ (inspect path)
+          next-step (?. path 2)]
+      (if
+       (and (= (?. curr :x) (?. goal :x)) (= (?. curr :y) (?. goal :y))) :at-goal
+       (= (type next-step) "nil") :pause
+       (< (- next-step.y 1) state.tile-y) :up
+       (> (- next-step.x 1) state.tile-x) :right
+       (< (- next-step.x 1) state.tile-x) :left
+       (> (- next-step.y 1) state.tile-y) :down
+       :pause)))
+
+  (fn transition! [{: state} new-state]
+    (print (.. "Changing state to " new-state))
+    (tset state :state new-state))
+
+  (fn react! [{: state : height : x : y : tile-w : tile-h : width &as self} map-state]
+    (if (= state.state :exit)
+        (do
+          (self:remove))
+        (let [(dx dy) (self:tile-movement-react! state.speed)
+              do-next (if (and (= dx 0) (= dy 0) (<= state.pause-ticks 0))
+                          (plan-next-step state map-state))
+              ]
+          (case do-next
+            :up (self:->up!)
+            :down (self:->down!)
+            :left (self:->left!)
+            :right (self:->right!)
+            :at-goal (case state.state
+                       :order (self:transition! :wait)
+                       :leave (self:transition! :exit))
+            :pause (tset self :state :pause-ticks (+ state.pause-ticks 100)))
+          (tset self :state :dx dx)
+          (tset self :state :dy dy)
+          (if (> state.pause-ticks 0)
+              (tset self :state :pause-ticks (math.max (- (or state.pause-ticks 0) 1) 0)))
+          (tset self :state :walking? (not (and (= 0 dx) (= 0 dy))))
+          ))
     self)
 
   (fn update [{:state {: animation : dx : dy : walking? &as state} &as self}]
@@ -68,6 +103,7 @@
       (if index
           (do (player:take-held)
               (table.remove self.state.cafe-order index)
+              (if (= (length self.state.cafe-order) 0) (self:transition! :leave))
               ))
 
       ))
@@ -84,6 +120,8 @@
             )
           hold
           ($ui:open-textbox! {:text "I don't think that's what I ordered."})
+          (= self.state.state :leave)
+          ($ui:open-textbox! {:text "I'm just standing here in protest."})
           ;;
           ($ui:open-textbox! {:text "I'm waiting for milk."})
           )
@@ -147,18 +185,22 @@
       ;; (player:setCollideRect 6 1 18 30)
       (player:setCollideRect 0 16 32 16)
       (player:setGroups [3])
-      (player:setCollidesWithGroups [1 4])
+      (player:setCollidesWithGroups [3])
       (tset player :draw draw)
       (tset player :update update)
       (tset player :react! react!)
       (tset player :tile-h tile-h)
       (tset player :tile-w tile-w)
       (tset player :interact! interact!)
+      (tset player :transition! transition!)
       (tset player :takes-item-from? takes-item-from?)
       (tset player :take-item-from! take-item-from!)
       (tset player :state {: animation :speed 2 :dx 0 :dy 0 :visible true
                            :cafe-order (generate-order)
+                           :pause-ticks 0
                            :facing :down
+                           :state :order
+                           :patience 10
                            :tile-x (// x tile-w) :tile-y (// y tile-h)})
       (tile.add! player {: tile-h : tile-w})
       player)))

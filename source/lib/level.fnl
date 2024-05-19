@@ -52,13 +52,14 @@
     )
 
 
-  (fn add-entities! [{: tile-h : tile-w &as layer} entity-map]
+  (fn add-entities! [{: tile-h : tile-w &as layer} entity-map layer-details]
     (icollect [_ {: id : width : height : x : y : fields} (ipairs layer.entities)]
       (let [entity-mod (?. entity-map id)
             ;; NOTE: Skips unknown entities instead of error
             entity (if entity-mod
-                       (entity-mod.new! x y {: fields : tile-h : tile-w : width : height}))]
-        (if entity (entity:add))
+                       (entity-mod.new! x y {: fields : tile-h : tile-w : width : height
+                                             :layer-details (or (?. layer-details id) {})}))]
+        (if (?. entity :add) (entity:add))
         entity)))
 
   ;; TODO: Make a level parser that can take entities map and prep a full level
@@ -71,7 +72,7 @@
                     (tile-layer-sprite layer true layer-details)
                     (tile-layer-sprite layer false layer-details)))
           entities (?. loaded :entity-layers 1)
-          entities (add-entities! entities entity-map)]
+          entities (add-entities! entities entity-map layer-details)]
       {
        :stage-width loaded.w :stage-height loaded.h
        :ticks 0

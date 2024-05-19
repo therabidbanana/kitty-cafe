@@ -11,6 +11,16 @@
           [norm-x norm-y] (self:move-normals)
           dx (* speed norm-x)
           dy (* speed norm-y)
+          dx (if (> dx 0)
+                 (math.min dx state.move-x)
+                 (< dx 0)
+                 (math.max dx state.move-x)
+                 dx)
+          dy (if (> dy 0)
+                 (math.min dy state.move-y)
+                 (< dy 0)
+                 (math.max dy state.move-y)
+                 dy)
           ]
       (tset self.state :tile-x state.tile-x)
       (tset self.state :tile-y state.tile-y)
@@ -68,7 +78,15 @@
   (fn ->stop! [{:tile-movement-state state :tile-movement-opts { : tile-w : tile-h } &as self} dx dy]
     ;; (tset state :move-x (% (+ self.x (or dx 0)) tile-w))
     ;; (tset state :move-y (% (+ self.y (or dy 0)) tile-h))
-    (tset state :moving nil))
+    (let [target-x-tile (math.floor (+ (/ self.x tile-w) 0.5))
+          diff-x (- (* target-x-tile tile-w) self.x)
+          target-y-tile (math.floor (+ (/ self.y tile-h) 0.5))
+          diff-y (- (* target-y-tile tile-h) self.y)]
+      ;; (tset state :move-x diff-x)
+      (tset state :tile-x target-x-tile)
+      ;; (tset state :move-y diff-y)
+      (tset state :tile-y target-y-tile)
+      (tset state :moving nil)))
 
   (fn add! [item opts]
     (tset item :tile-movement-opts opts)
