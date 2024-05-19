@@ -14,7 +14,8 @@
           ;; Option 1 - Loads at runtime
           ;; loaded (prepare-level! (ldtk.load-level {:level 0}) entity-map)
           ;; Option 2 - relies on deflevel compiling
-          loaded (prepare-level! level_0 entity-map)
+          loaded (prepare-level! level_0 entity-map {:tiles {:z-index 100}
+                                                     :flooring {:z-index -110}})
           ]
       loaded
       )

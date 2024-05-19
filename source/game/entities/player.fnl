@@ -16,23 +16,26 @@
    ]
 
   (fn react! [{: state : height : x : y : width &as self}]
-    (if (justpressed? playdate.kButtonLeft) (self:->left!)
-        (justpressed? playdate.kButtonRight) (self:->right!)
-        (justpressed? playdate.kButtonUp) (self:->up!)
-        (justpressed? playdate.kButtonDown) (self:->down!))
+    (if state.walking? nil
+        (pressed? playdate.kButtonLeft) (self:->left!)
+        (pressed? playdate.kButtonRight) (self:->right!)
+        (pressed? playdate.kButtonUp) (self:->up!)
+        (pressed? playdate.kButtonDown) (self:->down!))
     (let [(dx dy) (self:tile-movement-react! state.speed)
-          dx (if (and (>= (+ x width) 400) (> dx 0)) 0
-                 (and (<= x 0) (< dx 0)) 0
-                 dx)
-          dy (if (and (>= (+ y height) 240) (> dy 0)) 0
-                 (and (<= y 0) (< dy 0)) 0
-                 dy)
+          ;; Leave screen
+          ;; dx (if (and (>= (+ x width) 400) (> dx 0)) 0
+          ;;        (and (<= x 0) (< dx 0)) 0
+          ;;        dx)
+          ;; dy (if (and (>= (+ y height) 240) (> dy 0)) 0
+          ;;        (and (<= y 0) (< dy 0)) 0
+          ;;        dy)
           [facing-x facing-y] (case state.facing
-                                :left [(- x 8) (+ y (// height 2))]
-                                :right [(+ 40 x) (+ y (// height 2))]
-                                :up [(+ x (// width 2)) (- y 8)]
-                                _ [(+ x (// width 2)) (+ 8 height y)]) ;; 40 for height / width of sprite + 8
-          [facing-sprite & _] (gfx.sprite.querySpritesAtPoint facing-x facing-y)
+                                :left [(- x 12) (+ y 8)]
+                                :right [(+ 44 x) (+ y 8)]
+                                :up [(+ x 8) (- y 12)]
+                                _ [(+ x 8) (+ 12 height y)]) ;; 40 for height / width of sprite + 8
+          [facing-sprite & _] (icollect [_ spr (ipairs (gfx.sprite.querySpritesAtPoint facing-x facing-y))]
+                                (if (?. spr :interact!) spr nil))
           ]
       (tset self :state :dx dx)
       (tset self :state :dy dy)
@@ -42,7 +45,8 @@
           (scene-manager:select! :menu))
       (if (and (playdate.buttonJustPressed playdate.kButtonA)
                facing-sprite)
-          ($ui:open-textbox! {:text (gfx.getLocalizedText "textbox.test2")}))
+          (facing-sprite:interact! self)
+          )
       )
     self)
 
@@ -56,6 +60,13 @@
                                 {:if (.. state.facing "." :walking)})))
     (self:markDirty)
     )
+
+  (fn take-held [{:state {: holding} &as self}]
+    (tset self :state :holding nil)
+    holding)
+
+  (fn hold-item! [{:state {: holding} &as self} item]
+    (tset self :state :holding item))
 
   (fn draw [{:state {: animation : dx : dy : visible : walking?} &as self} x y w h]
     (animation:draw x y))
@@ -114,12 +125,15 @@
           player (gfx.sprite.new)]
       (player:setCenter 0 0)
       (player:setBounds x y 32 32)
-      (player:setCollideRect 6 1 18 30)
+      (player:setCollideRect 0 16 32 16)
       (player:setGroups [1])
       (player:setCollidesWithGroups [3 4])
+      (player:setZIndex 1)
       (tset player :draw draw)
       (tset player :update update)
       (tset player :react! react!)
+      (tset player :take-held take-held)
+      (tset player :hold-item! hold-item!)
       (tset player :state {:facing :down : animation :speed 2 :dx 0 :dy 0 :visible true})
       (tile.add! player {: tile-h : tile-w})
       player)))

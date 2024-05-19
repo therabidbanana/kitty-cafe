@@ -17,13 +17,13 @@
   (fn react! [{: state : height : x : y : tile-w : tile-h : width &as self}]
     
     (let [(dx dy) (self:tile-movement-react! state.speed)]
-      (if (and (= dx 0) (= dy 0))
-          (case (math.random 0 100)
-            1 (self:->left!)
-            2 (self:->right!)
-            3 (self:->up!)
-            4 (self:->down!)
-            _ nil))
+      ;; (if (and (= dx 0) (= dy 0))
+      ;;     (case (math.random 0 100)
+      ;;       1 (self:->left!)
+      ;;       2 (self:->right!)
+      ;;       3 (self:->up!)
+      ;;       4 (self:->down!)
+      ;;       _ nil))
       (tset self :state :dx dx)
       (tset self :state :dy dy)
       (tset self :state :walking? (not (and (= 0 dx) (= 0 dy))))
@@ -46,6 +46,49 @@
 
   (fn draw [{:state {: animation : dx : dy : visible : walking?} &as self} x y w h]
     (animation:draw x y))
+
+  (fn generate-order []
+    [{:item :milk
+      :modifiers []}])
+
+  (fn match-to-order [order held]
+    (?. (icollect [k v (ipairs order)]
+          (if (and (= (?. v :item) (?. held :item))) k))
+        1))
+
+  (fn takes-item-from? [self player]
+    (let [order self.state.cafe-order
+          held  player.state.holding
+          index (match-to-order order held)]
+      index)
+    )
+
+  (fn take-item-from! [self player]
+    (let [index (self:takes-item-from? player)]
+      (if index
+          (do (player:take-held)
+              (table.remove self.state.cafe-order index)
+              ))
+
+      ))
+
+  (fn interact! [self player]
+    (let [order self.state.cafe-order
+          hold  player.state.holding]
+      (if (self:takes-item-from? player)
+          (let [taken (self:take-item-from! player)]
+            (if (= (type (next self.state.cafe-order)) "nil")
+                ($ui:open-textbox! {:text "Thanks! Have a nice day!"})
+                ($ui:open-textbox! {:text "Thanks! I'm still waiting for..."})
+                )
+            )
+          hold
+          ($ui:open-textbox! {:text "I don't think that's what I ordered."})
+          ;;
+          ($ui:open-textbox! {:text "I'm waiting for milk."})
+          )
+      )
+    )
 
   ;; (fn collisionResponse [self other]
   ;;   (other:collisionResponse))
@@ -102,7 +145,7 @@
       (player:setCenter 0 0)
       (player:setBounds x y 32 32)
       ;; (player:setCollideRect 6 1 18 30)
-      (player:setCollideRect 0 0 32 32)
+      (player:setCollideRect 0 16 32 16)
       (player:setGroups [3])
       (player:setCollidesWithGroups [1 4])
       (tset player :draw draw)
@@ -110,7 +153,11 @@
       (tset player :react! react!)
       (tset player :tile-h tile-h)
       (tset player :tile-w tile-w)
+      (tset player :interact! interact!)
+      (tset player :takes-item-from? takes-item-from?)
+      (tset player :take-item-from! take-item-from!)
       (tset player :state {: animation :speed 2 :dx 0 :dy 0 :visible true
+                           :cafe-order (generate-order)
                            :facing :down
                            :tile-x (// x tile-w) :tile-y (// y tile-h)})
       (tile.add! player {: tile-h : tile-w})
