@@ -5,7 +5,8 @@
       line    (require :source.game.entities.line)
       wait    (require :source.game.entities.wait)
       exit    (require :source.game.entities.exit)
+      entrance    (require :source.game.entities.entrance)
       ]
   {: player : npc
    : order : milk
-   : line : wait : exit})
+   : line : wait : exit : entrance})

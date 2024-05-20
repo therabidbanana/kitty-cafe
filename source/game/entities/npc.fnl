@@ -36,9 +36,15 @@
        (> (- next-step.y 1) state.tile-y) :down
        :pause)))
 
-  (fn transition! [{: state} new-state]
+  (fn transition! [{: state &as self} new-state]
     (print (.. "Changing state to " new-state))
-    (tset state :state new-state))
+    (tset state :state new-state)
+    (if (= :leave new-state)
+        (do
+          ;; No more colliding with the line
+          (self:setGroups [1])
+          (self:setCollidesWithGroups [1])))
+    )
 
   (fn react! [{: state : height : x : y : tile-w : tile-h : width &as self} map-state]
     (if (= state.state :exit)
@@ -121,7 +127,7 @@
           hold
           ($ui:open-textbox! {:text "I don't think that's what I ordered."})
           (= self.state.state :leave)
-          ($ui:open-textbox! {:text "I'm just standing here in protest."})
+          ($ui:open-textbox! {:text "I'm just standing here because I can't walk away yet."})
           ;;
           ($ui:open-textbox! {:text "I'm waiting for milk."})
           )

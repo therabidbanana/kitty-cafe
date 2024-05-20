@@ -891,7 +891,7 @@
 						},
 						{
 							"__identifier": "exit",
-							"__grid": [2,14],
+							"__grid": [2,16],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -900,14 +900,14 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 21,
-							"px": [32,224],
+							"px": [32,256],
 							"fieldInstances": [],
 							"__worldX": 32,
-							"__worldY": 224
+							"__worldY": 256
 						},
 						{
 							"__identifier": "line",
-							"__grid": [2,13],
+							"__grid": [2,12],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -916,10 +916,10 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 19,
-							"px": [32,208],
+							"px": [32,192],
 							"fieldInstances": [],
 							"__worldX": 32,
-							"__worldY": 208
+							"__worldY": 192
 						},
 						{
 							"__identifier": "line",
@@ -1275,7 +1275,7 @@
 						},
 						{
 							"__identifier": "line",
-							"__grid": [2,14],
+							"__grid": [1,14],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1284,14 +1284,14 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 19,
-							"px": [32,224],
+							"px": [16,224],
 							"fieldInstances": [],
-							"__worldX": 32,
+							"__worldX": 16,
 							"__worldY": 224
 						},
 						{
 							"__identifier": "npc",
-							"__grid": [1,14],
+							"__grid": [1,15],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 17, "x": 0, "y": 0, "w": 32, "h": 32 },
@@ -1300,10 +1300,10 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 7,
-							"px": [16,224],
+							"px": [16,240],
 							"fieldInstances": [],
 							"__worldX": 16,
-							"__worldY": 224
+							"__worldY": 240
 						},
 						{
 							"__identifier": "line",
@@ -1320,6 +1320,54 @@
 							"fieldInstances": [],
 							"__worldX": 16,
 							"__worldY": 224
+						},
+						{
+							"__identifier": "line",
+							"__grid": [3,13],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#EAD4AA",
+							"iid": "6348db70-fec0-11ee-a418-f5e34ee3f64a",
+							"width": 16,
+							"height": 16,
+							"defUid": 19,
+							"px": [48,208],
+							"fieldInstances": [],
+							"__worldX": 48,
+							"__worldY": 208
+						},
+						{
+							"__identifier": "line",
+							"__grid": [1,15],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#EAD4AA",
+							"iid": "a142a410-fec0-11ee-a73f-857e596d1d6e",
+							"width": 16,
+							"height": 16,
+							"defUid": 19,
+							"px": [16,240],
+							"fieldInstances": [],
+							"__worldX": 16,
+							"__worldY": 240
+						},
+						{
+							"__identifier": "line",
+							"__grid": [2,15],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#EAD4AA",
+							"iid": "a1f1cfd0-fec0-11ee-a73f-e7eaa5860319",
+							"width": 16,
+							"height": 16,
+							"defUid": 19,
+							"px": [32,240],
+							"fieldInstances": [],
+							"__worldX": 32,
+							"__worldY": 240
 						}
 					]
 				},

@@ -2,25 +2,25 @@ compile: source/**/*.fnl
 	./support/build.sh
 
 build: compile
-	pdc -k source test.pdx
-	cp source/*.ldtk test.pdx/
+	pdc -k source kitty-cafe.pdx
+	cp source/*.ldtk kitty-cafe.pdx/
 
 launch: build
-	playdate test.pdx
+	playdate kitty-cafe.pdx
 
 clean:
-	rm ./source/main.lua ./test.pdx
+	rm ./source/main.lua ./kitty-cafe.pdx
 
 win-compile: source/**/*.fnl
 	powershell.exe "./support/build.ps1"
 
 win-build: win-compile
-	powershell.exe "pdc -k source test.pdx"
-	powershell.exe "cp source/*.ldtk test.pdx/"
+	powershell.exe "pdc -k source kitty-cafe.pdx"
+	powershell.exe "cp source/*.ldtk kitty-cafe.pdx/"
 
 win-launch: win-build
-	powershell.exe "playdate test.pdx"
+	powershell.exe "playdate kitty-cafe.pdx"
 
 win-clean:
 	powershell.exe -noprofile -command "& {rm ./source/main.lua}"
-	powershell.exe -noprofile -command "& {rm ./test.pdx}"
+	powershell.exe -noprofile -command "& {rm ./kitty-cafe.pdx}"
