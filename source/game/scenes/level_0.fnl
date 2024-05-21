@@ -29,6 +29,7 @@
                                                      :line { : node-list : grid-w : locations}
                                                      :wait { : node-list : grid-w : locations}
                                                      :exit { : node-list : grid-w : locations}
+                                                     :appliances {:z-index 0}
                                                      :entrance { :spawn (?. entity-map :npc) }
                                                      :flooring {:z-index -110}})
           graph (playdate.pathfinder.graph.new2DGrid grid-w grid-h false node-list)
