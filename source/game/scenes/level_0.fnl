@@ -25,21 +25,30 @@
           grid-h (// level_0.h tile-size)
           node-list (-node-list! (* grid-w grid-h))
           locations {}
+          patrons []
           loaded (prepare-level! level_0 entity-map {:tiles {:z-index 100}
                                                      :line { : node-list : grid-w : locations}
                                                      :wait { : node-list : grid-w : locations}
                                                      :exit { : node-list : grid-w : locations}
+                                                     :npc { : patrons }
                                                      :appliances {:z-index 0}
                                                      :entrance { :spawn (?. entity-map :npc) }
-                                                     :flooring {:z-index -110}})
+                                                     :floor_covers {:z-index -100}
+                                                     :flooring {:z-index -110}
+                                                     })
           graph (playdate.pathfinder.graph.new2DGrid grid-w grid-h false node-list)
           graph-locations (collect [k v (pairs locations)]
                             ;; (values k (graph:nodeWithXY (+ v.tile-x 1) (+ v.tile-y 1)))
                             (values k (graph:nodeWithID (+ (* grid-w v.tile-y) (+ v.tile-x 1))))
                             )
-          wait-node (?. graph-locations :wait)]
+          wait-node (?. graph-locations :wait)
+          player (?. (icollect [_ v (ipairs loaded.entities)]
+                       (if (?. v :player?) v)) 1)
+          hud (entity-map.hud.new! player)]
+      (hud:add)
       ;; (inspect {:x wait-node.x :y wait-node.y})
-      (tset $ :state {: graph : locations : graph-locations : grid-w :ticks 1})
+      (tset $ :state {: graph : locations : graph-locations : grid-w
+                      :ticks 1 })
       loaded
       )
     )

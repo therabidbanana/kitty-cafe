@@ -65,6 +65,10 @@
     (tset self :state :holding nil)
     holding)
 
+  (fn pay! [{:state {: cash} &as self} paid]
+    (tset self :state :cash (+ (or cash 0) paid))
+    )
+
   (fn hold-item! [{:state {: holding} &as self} item]
     (tset self :state :holding item))
 
@@ -130,11 +134,13 @@
       (player:setCollidesWithGroups [3 4])
       (player:setZIndex 1)
       (tset player :draw draw)
+      (tset player :pay! pay!)
+      (tset player :player? true)
       (tset player :update update)
       (tset player :react! react!)
       (tset player :take-held take-held)
       (tset player :hold-item! hold-item!)
-      (tset player :state {:facing :down : animation :speed 2 :dx 0 :dy 0 :visible true})
+      (tset player :state {:facing :down : animation :speed 2 :dx 0 :dy 0 :visible true :cash 1})
       (tile.add! player {: tile-h : tile-w})
       player)))
 

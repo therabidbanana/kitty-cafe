@@ -6,7 +6,8 @@
       wait    (require :source.game.entities.wait)
       exit    (require :source.game.entities.exit)
       entrance    (require :source.game.entities.entrance)
+      hud    (require :source.game.entities.hud)
       ]
-  {: player : npc
+  {: player : npc : hud
    : order : milk
    : line : wait : exit : entrance})

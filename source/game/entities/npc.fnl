@@ -97,21 +97,33 @@
           (if (and (= (?. v :item) (?. held :item))) k))
         1))
 
+  (fn value-of-item [item]
+    ;; Guaranteed random
+    4)
+
   (fn takes-item-from? [self player]
     (let [order self.state.cafe-order
           held  player.state.holding
-          index (match-to-order order held)]
-      index)
+          index (match-to-order order held)
+          value (if index (value-of-item held))]
+      (values index value))
     )
 
-  (fn take-item-from! [self player]
-    (let [index (self:takes-item-from? player)]
-      (if index
-          (do (player:take-held)
-              (table.remove self.state.cafe-order index)
-              (if (= (length self.state.cafe-order) 0) (self:transition! :leave))
-              ))
+  (fn payment-owed [self]
+    (let [owed (or self.state.owes 0)
+          tip  (math.random 0 2)]
+      (+ owed tip)))
 
+  (fn take-item-from! [self player]
+    (let [(index value) (self:takes-item-from? player)]
+      (when index
+        (player:take-held)
+        (tset self.state :owes (+ value (or self.state.owes 0)))
+        (table.remove self.state.cafe-order index)
+        (when (= (length self.state.cafe-order) 0)
+          (player:pay! (payment-owed self))
+          (self:transition! :leave)
+          ))
       ))
 
   (fn interact! [self player]
@@ -137,7 +149,7 @@
   ;; (fn collisionResponse [self other]
   ;;   (other:collisionResponse))
 
-  (fn new! [x y {: tile-h : tile-w}]
+  (fn new! [x y {: tile-h : tile-w }]
     (let [image (gfx.imagetable.new :assets/images/patron1)
           animation (anim.new {: image :states [
           {:state :down.standing
