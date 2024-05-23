@@ -10,11 +10,11 @@
   (fn react! [self map-state]
     (let [roll (math.random 0 800)
           entity self.state.spawn]
-      (if (and (= roll 1) (= (length (self:overlappingSprites)) 0))
+      (if (and (<= roll map-state.speed) (= (length (self:overlappingSprites)) 0))
           (let [new-customer (entity.new! self.x self.y {:tile-h self.tile-h :tile-w self.tile-w})]
             (print "Spawned new customer")
             (new-customer:add))
-          (= roll 1)
+          (<= roll map-state.speed)
           (print "could not spawn another customer")
           ))
     )

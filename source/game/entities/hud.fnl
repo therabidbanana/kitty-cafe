@@ -22,7 +22,9 @@
 
   (fn draw [self]
     (let [rect (playdate.geometry.rect.new 0 0
-                                           60 20)]
+                                           60 20)
+          heldrect (playdate.geometry.rect.new 64 0
+                                               140 14)]
       (gfx.setColor gfx.kColorWhite)
       (gfx.fillRoundRect rect 4)
       (gfx.setLineWidth 2)
@@ -32,6 +34,16 @@
       (gfx.drawText (.. "$" (or self.state.player-cash 0)) ;;(rect:insetBy 6 2)
                              6 2
                              )
+      (when self.state.player-held
+          (gfx.setColor gfx.kColorWhite)
+          (gfx.fillRoundRect heldrect 4)
+          (gfx.setLineWidth 2)
+          (gfx.setColor gfx.kColorBlack)
+          (gfx.drawRoundRect heldrect 4)
+          (gfx.setColor gfx.kColorBlack)
+          (self.tagFont:drawText (.. "Held: " self.state.player-held.item)
+                        70 2
+                        ))
       )
 
     )
@@ -46,10 +58,10 @@
   (fn new! [player]
     (let [hud (gfx.sprite.new)]
       (hud:moveTo 10 0)
-      (hud:setSize 100 100)
+      (hud:setSize 240 100)
       (hud:setCenter 0 0)
       (hud:setZIndex 1000)
-      ;; (tset hud :tagFont (gfx.font.new :assets/fonts/Nontendo-Bold))
+      (tset hud :tagFont (gfx.font.new :assets/fonts/Nontendo-Bold))
       (tset hud :state {: player})
       (tset hud :draw draw)
       (tset hud :update update)

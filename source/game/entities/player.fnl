@@ -140,7 +140,7 @@
       (tset player :react! react!)
       (tset player :take-held take-held)
       (tset player :hold-item! hold-item!)
-      (tset player :state {:facing :down : animation :speed 2 :dx 0 :dy 0 :visible true :cash 1})
+      (tset player :state {:facing :down : animation :speed 2 :dx 0 :dy 0 :visible true :cash 0})
       (tile.add! player {: tile-h : tile-w})
       player)))
 

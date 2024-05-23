@@ -1,4 +1,4 @@
-(import-macros {: pd/import : defns : inspect} :source.lib.macros)
+(import-macros {: pd/import : clamp : defns : inspect} :source.lib.macros)
 (import-macros {: deflevel} :source.lib.ldtk.macros)
 
 (deflevel :level_0
@@ -44,11 +44,14 @@
           wait-node (?. graph-locations :wait)
           player (?. (icollect [_ v (ipairs loaded.entities)]
                        (if (?. v :player?) v)) 1)
-          hud (entity-map.hud.new! player)]
+          hud (entity-map.hud.new! player)
+          clock (entity-map.clock.new! $)
+          ]
       (hud:add)
+      (clock:add)
       ;; (inspect {:x wait-node.x :y wait-node.y})
       (tset $ :state {: graph : locations : graph-locations : grid-w
-                      :ticks 1 })
+                      :ticks 1 :seconds 0 })
       loaded
       )
     )
@@ -57,8 +60,13 @@
 
   (fn tick! [$]
     (if ($ui:active?) ($ui:tick!)
-        (do
+        (let [(change acceleratedChange) (playdate.getCrankChange)
+              speed (or $.state.speed 1)
+              speed (clamp 1 (+ speed (// acceleratedChange 30)) 4)
+              seconds  (+ (* speed 2) $.state.seconds)]
           (tset $ :state :ticks (+ $.state.ticks 1))
+          (tset $ :state :seconds seconds)
+          (tset $ :state :speed speed)
           (gfx.sprite.performOnAllSprites (fn react-each [ent]
                                             (if (?. ent :react!) (ent:react! $.state)))))))
   (fn draw! [$]

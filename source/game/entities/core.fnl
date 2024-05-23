@@ -7,7 +7,8 @@
       exit    (require :source.game.entities.exit)
       entrance    (require :source.game.entities.entrance)
       hud    (require :source.game.entities.hud)
+      clock    (require :source.game.entities.clock)
       ]
-  {: player : npc : hud
+  {: player : npc : hud : clock
    : order : milk
    : line : wait : exit : entrance})
