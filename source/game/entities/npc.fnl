@@ -51,7 +51,7 @@
     (if (= state.state :exit)
         (do
           (self:remove))
-        (let [(dx dy) (self:tile-movement-react! state.speed)
+        (let [(dx dy) (self:tile-movement-react! (* map-state.speed state.speed))
               ;; Leave if fed up
               _ (if (and (= state.state :order) (< state.patience 0))
                     (do
@@ -116,7 +116,7 @@
 
   (fn value-of-item [item]
     ;; Guaranteed random
-    4)
+    (order_helper.item-value item))
 
   (fn takes-item-from? [self player]
     (let [order self.state.cafe-order
@@ -239,7 +239,7 @@
                            :pause-ticks 0
                            :facing :down
                            :state :order
-                           :patience 10
+                           :patience (math.random 15 25)
                            :tile-x (// x tile-w) :tile-y (// y tile-h)})
       (tile.add! player {: tile-h : tile-w})
       player)))

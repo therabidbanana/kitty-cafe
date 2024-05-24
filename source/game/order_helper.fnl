@@ -20,12 +20,20 @@
       _ [(random-milk)])
     )
 
+  (fn item-value [{ : item : modifiers &as full-item}]
+    (let [modifier-value (length (or modifiers []))]
+      (case item
+        :milk (+ 2 modifier-value)
+        _ 0)))
+
   (fn describe-item [full-item]
     (if (= (type full-item) "nil")
         "nothing"
-        (let [{: item : modifiers} full-item]
-          (if (> (length (or modifiers [])) 0)
-              (.. item " with " (table.concat modifiers " & "))
+        (let [{: item : modifiers} full-item
+              mods (or modifiers [])
+              sorted (table.sort mods)]
+          (if (> (length mods) 0)
+              (.. item " with " (table.concat mods " & "))
               item)))
     )
 

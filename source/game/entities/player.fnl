@@ -15,13 +15,13 @@
          :right (* 2 sprite-count)}
    ]
 
-  (fn react! [{: state : height : x : y : width &as self}]
+  (fn react! [{: state : height : x : y : width &as self} map-state]
     (if state.walking? nil
         (pressed? playdate.kButtonLeft) (self:->left!)
         (pressed? playdate.kButtonRight) (self:->right!)
         (pressed? playdate.kButtonUp) (self:->up!)
         (pressed? playdate.kButtonDown) (self:->down!))
-    (let [(dx dy) (self:tile-movement-react! state.speed)
+    (let [(dx dy) (self:tile-movement-react! (* map-state.speed state.speed))
           ;; Leave screen
           ;; dx (if (and (>= (+ x width) 400) (> dx 0)) 0
           ;;        (and (<= x 0) (< dx 0)) 0
