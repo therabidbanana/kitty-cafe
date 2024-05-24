@@ -42,8 +42,8 @@
     (tset state :state new-state)
     (if (= :leave new-state)
         (do
-          ;; No more colliding with the line
-          (self:setGroups [1])
+          ;; No more colliding with others in line
+          (self:setGroups [8])
           (self:setCollidesWithGroups [1])))
     )
 
@@ -52,6 +52,10 @@
         (do
           (self:remove))
         (let [(dx dy) (self:tile-movement-react! state.speed)
+              ;; Leave if fed up
+              _ (if (and (= state.state :order) (< state.patience 0))
+                    (do
+                      (self:transition! :leave)))
               do-next (if (and (= dx 0) (= dy 0) (<= state.pause-ticks 0))
                           (plan-next-step state map-state))
               ]
@@ -61,7 +65,8 @@
             :left (self:->left!)
             :right (self:->right!)
             :at-goal (case state.state
-                       :order (self:transition! :wait)
+                       :order (do (self:transition! :wait)
+                                  (self:face-forward!))
                        :leave (self:transition! :exit))
             :pause (tset self :state :pause-ticks (+ state.pause-ticks 100)))
           (tset self :state :dx dx)
@@ -71,6 +76,10 @@
           (tset self :state :walking? (not (and (= 0 dx) (= 0 dy))))
           ))
     self)
+
+  (fn face-forward! [{:state {: animation : dx : dy : walking? &as state} &as self}]
+    (self:->face! :up)
+    (animation:transition! (.. :up "." :standing)))
 
   (fn update [{:state {: animation : dx : dy : walking? &as state} &as self}]
     (let [target-x (+ dx self.x)
@@ -82,7 +91,14 @@
                                  {:if (.. state.facing "." :walking)}))
       (tset self :state :dx 0)
       (tset self :state :dy 0)
-      (if (> count 0) (self:->stop!))
+      (if (> count 0) ;; Forced to stop
+          (let [patience (or state.patience 10)
+                pause-ticks (or state.pause-ticks 0)]
+            (tset self :state :patience (- patience 1))
+            (if (< patience 1)
+                (tset self :state :pause-ticks 0)
+                (tset self :state :pause-ticks (* (- patience 1) (math.random 7 12))))
+            (self:->stop!)))
       (self:markDirty))
     )
 
@@ -215,6 +231,7 @@
       (tset player :tile-w tile-w)
       (tset player :interact! interact!)
       (tset player :transition! transition!)
+      (tset player :face-forward! face-forward!)
       (tset player :takes-item-from? takes-item-from?)
       (tset player :take-item-from! take-item-from!)
       (tset player :state {: animation :speed 2 :dx 0 :dy 0 :visible true

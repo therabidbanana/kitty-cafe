@@ -75,6 +75,10 @@
     (tset state :facing :down)
     (tset state :moving :down))
 
+  (fn ->face! [{:tile-movement-state state &as self} face]
+    (tset state :facing face)
+    )
+
   (fn ->stop! [{:tile-movement-state state :tile-movement-opts { : tile-w : tile-h } &as self} dx dy]
     ;; (tset state :move-x (% (+ self.x (or dx 0)) tile-w))
     ;; (tset state :move-y (% (+ self.y (or dy 0)) tile-h))
@@ -103,5 +107,6 @@
     (tset item :->up! ->up!)
     (tset item :->down! ->down!)
     (tset item :->stop! ->stop!)
+    (tset item :->face! ->face!)
     (tset item :move-normals move-normals)
     item))
