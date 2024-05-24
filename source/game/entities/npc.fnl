@@ -6,6 +6,7 @@
    tile (require :source.lib.behaviors.tile-movement)
    $ui (require :source.lib.ui)
    anim (require :source.lib.animation)
+   order_helper (require :source.game.order_helper)
 
    sprite-count 6
    dirs {:down 0
@@ -89,12 +90,12 @@
     (animation:draw x y))
 
   (fn generate-order []
-    [{:item :milk
-      :modifiers []}])
+    (order_helper.generate-order)
+    )
 
   (fn match-to-order [order held]
     (?. (icollect [k v (ipairs order)]
-          (if (and (= (?. v :item) (?. held :item))) k))
+          (if (and held (order_helper.same-item? v held)) k))
         1))
 
   (fn value-of-item [item]
@@ -133,15 +134,18 @@
           (let [taken (self:take-item-from! player)]
             (if (= (type (next self.state.cafe-order)) "nil")
                 ($ui:open-textbox! {:text "Thanks! Have a nice day!"})
-                ($ui:open-textbox! {:text "Thanks! I'm still waiting for..."})
+                ($ui:open-textbox! {:text (.. "Thanks! I'm still waiting for... "
+                                              (order_helper.describe-items self.state.cafe-order))})
                 )
             )
           hold
           ($ui:open-textbox! {:text "I don't think that's what I ordered."})
           (= self.state.state :leave)
-          ($ui:open-textbox! {:text "I'm just standing here because I can't walk away yet."})
+          ($ui:open-textbox! {:text "I'm just standing here because I can't walk away yet [bug]."})
           ;;
-          ($ui:open-textbox! {:text "I'm waiting for milk."})
+          ($ui:open-textbox! {:text (.. "Can I get... "
+                                        (order_helper.describe-items self.state.cafe-order)
+                                        "?")})
           )
       )
     )

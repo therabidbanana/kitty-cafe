@@ -4,11 +4,13 @@
   [gfx playdate.graphics
    $ui (require :source.lib.ui)
    anim (require :source.lib.animation)
+   order_helper (require :source.game.order_helper)
    ]
 
   (fn react! [{:state { : player &as state} &as self}]
     (let [player-held (?. player :state :holding)
-          player-cash (?. player :state :cash)]
+          player-cash (?. player :state :cash)
+          player-held (if player-held (order_helper.describe-item player-held))]
       (when (not= player-cash state.player-cash)
         (tset state :player-cash player-cash)
         (tset state :dirty true)
@@ -41,7 +43,7 @@
           (gfx.setColor gfx.kColorBlack)
           (gfx.drawRoundRect heldrect 4)
           (gfx.setColor gfx.kColorBlack)
-          (self.tagFont:drawText (.. "Held: " self.state.player-held.item)
+          (self.tagFont:drawText (.. "Held: " self.state.player-held)
                         70 2
                         ))
       )

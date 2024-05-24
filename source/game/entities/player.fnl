@@ -30,11 +30,11 @@
           ;;        (and (<= y 0) (< dy 0)) 0
           ;;        dy)
           [facing-x facing-y] (case state.facing
-                                :left [(- x 12) (+ y 8)]
-                                :right [(+ 44 x) (+ y 8)]
-                                :up [(+ x 8) (- y 12)]
-                                _ [(+ x 8) (+ 12 height y)]) ;; 40 for height / width of sprite + 8
-          [facing-sprite & _] (icollect [_ spr (ipairs (gfx.sprite.querySpritesAtPoint facing-x facing-y))]
+                                :left [(- x 3) (+ y 19)]
+                                :right [(+ 3 width x) (+ y 19)]
+                                :up [(+ x 13) (- y 3)]
+                                _ [(+ x 13) (+ 3 height y)]) ;; 6x6 square near center mass
+          [facing-sprite & _] (icollect [_ spr (ipairs (gfx.sprite.querySpritesInRect facing-x facing-y 6 6))]
                                 (if (?. spr :interact!) spr nil))
           ]
       (tset self :state :dx dx)
@@ -71,6 +71,11 @@
 
   (fn hold-item! [{:state {: holding} &as self} item]
     (tset self :state :holding item))
+
+  (fn modify-item! [{:state {: holding} &as self} modifier]
+    (let [modifiers (or (?. holding :modifiers) [])
+          _ (table.insert modifiers modifier)]
+      (tset self :state :holding :modifiers modifiers)))
 
   (fn draw [{:state {: animation : dx : dy : visible : walking?} &as self} x y w h]
     (animation:draw x y))
@@ -140,6 +145,7 @@
       (tset player :react! react!)
       (tset player :take-held take-held)
       (tset player :hold-item! hold-item!)
+      (tset player :modify-item! modify-item!)
       (tset player :state {:facing :down : animation :speed 2 :dx 0 :dy 0 :visible true :cash 0})
       (tile.add! player {: tile-h : tile-w})
       player)))
