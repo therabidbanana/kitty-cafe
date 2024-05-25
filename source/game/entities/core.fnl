@@ -2,6 +2,7 @@
       npc    (require :source.game.entities.npc)
       order    (require :source.game.entities.order)
       milk    (require :source.game.entities.milk)
+      pastries    (require :source.game.entities.pastries)
       line    (require :source.game.entities.line)
       wait    (require :source.game.entities.wait)
       exit    (require :source.game.entities.exit)
@@ -13,6 +14,6 @@
       chocolate    (require :source.game.entities.chocolate)
       ]
   {: player : npc : hud : clock
-   : order : milk : trash
+   : order : milk : trash : pastries
    : vanilla : chocolate
    : line : wait : exit : entrance})

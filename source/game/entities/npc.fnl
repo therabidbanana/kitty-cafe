@@ -71,6 +71,7 @@
             :pause (tset self :state :pause-ticks (+ state.pause-ticks 100)))
           (tset self :state :dx dx)
           (tset self :state :dy dy)
+          (tset self :state :map-speed map-state.speed)
           (if (> state.pause-ticks 0)
               (tset self :state :pause-ticks (math.max (- (or state.pause-ticks 0) 1) 0)))
           (tset self :state :walking? (not (and (= 0 dx) (= 0 dy))))
@@ -93,11 +94,17 @@
       (tset self :state :dy 0)
       (if (> count 0) ;; Forced to stop
           (let [patience (or state.patience 10)
-                pause-ticks (or state.pause-ticks 0)]
-            (tset self :state :patience (- patience 1))
+                pause-ticks (or state.pause-ticks 0)
+                new-patience (if
+                              (<= patience state.map-speed)
+                              (- patience 1)
+                              (<= (math.random 1 patience) state.map-speed)
+                              (- patience 1)
+                              patience)]
+            (tset self :state :patience new-patience)
             (if (< patience 1)
-                (tset self :state :pause-ticks 0)
-                (tset self :state :pause-ticks (* (- patience 1) (math.random 7 12))))
+                (tset self :state :pause-ticks 8)
+                (tset self :state :pause-ticks (* new-patience (math.random 7 12))))
             (self:->stop!)))
       (self:markDirty))
     )
@@ -170,7 +177,9 @@
   ;;   (other:collisionResponse))
 
   (fn new! [x y {: tile-h : tile-w }]
-    (let [image (gfx.imagetable.new :assets/images/patron1)
+    (let [image (case (math.random 1 2)
+                  1 (gfx.imagetable.new :assets/images/patron1)
+                  _ (gfx.imagetable.new :assets/images/patron2))
           animation (anim.new {: image :states [
           {:state :down.standing
            :start (+ 1 dirs.down) :end (+ 1 dirs.down)
@@ -239,7 +248,7 @@
                            :pause-ticks 0
                            :facing :down
                            :state :order
-                           :patience (math.random 15 25)
+                           :patience (math.random 9 18)
                            :tile-x (// x tile-w) :tile-y (// y tile-h)})
       (tile.add! player {: tile-h : tile-w})
       player)))

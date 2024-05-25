@@ -18,18 +18,23 @@
     self)
 
   (fn draw [self]
-    ;; (gfx.setColor gfx.kColorWhite)
-    ;; (gfx.fillRoundRect heldrect 4)
-    ;; (gfx.setLineWidth 2)
-    ;; (gfx.setColor gfx.kColorBlack)
-    ;; (gfx.drawRoundRect heldrect 4)
     (gfx.setColor gfx.kColorWhite)
     (let [mode (playdate.graphics.getImageDrawMode)]
       (playdate.graphics.setImageDrawMode "fillWhite")
       (self.tagFont:drawText (.. (string.format "%02d" (// self.state.minutes 60)) " : "
                                  (string.format "%02d" (% self.state.minutes 60))
-                                 " (x" self.state.speed  ")")
+                                 (if (> self.state.minutes 720) "pm" "am")
+                                 )
                              0 2
+                             )
+      (gfx.setColor gfx.kColorWhite)
+      (gfx.fillRoundRect 6 14 24 14 2)
+      (gfx.setLineWidth 1)
+      (gfx.setColor gfx.kColorBlack)
+      (gfx.drawRoundRect 6 14 24 14 2)
+      (playdate.graphics.setImageDrawMode "fillBlack")
+      (self.tagFont:drawText (.. "x" (string.format "%d" self.state.speed))
+                             8 16
                              )
       (playdate.graphics.setImageDrawMode mode)
       )
@@ -48,7 +53,7 @@
     (let [hud (gfx.sprite.new)]
       (hud:setCenter 0 0)
       (hud:setSize 50 60)
-      (hud:moveTo 350 0)
+      (hud:moveTo 340 0)
       (hud:setZIndex 1001)
       (tset hud :tagFont (gfx.font.new :assets/fonts/Nontendo-Bold))
       (tset hud :state {: level :minutes 0 :speed 1})

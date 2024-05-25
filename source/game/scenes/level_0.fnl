@@ -61,12 +61,15 @@
   (fn tick! [$]
     (if ($ui:active?) ($ui:tick!)
         (let [(change acceleratedChange) (playdate.getCrankChange)
+              cranked (+ (or $.state.cranked 0) acceleratedChange)
+              cranked (clamp 0 cranked 960) ;; 3x is fastest without bugging move
               speed (or $.state.speed 1)
-              speed (clamp 1 (+ speed (// acceleratedChange 30)) 4)
+              speed (clamp 1 (+ 1 (// cranked 360)) 3)
               seconds  (+ (* speed 2) $.state.seconds)]
           (tset $ :state :ticks (+ $.state.ticks 1))
           (tset $ :state :seconds seconds)
           (tset $ :state :speed speed)
+          (tset $ :state :cranked cranked)
           (gfx.sprite.performOnAllSprites (fn react-each [ent]
                                             (if (?. ent :react!) (ent:react! $.state)))))))
   (fn draw! [$]
