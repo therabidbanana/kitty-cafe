@@ -9,7 +9,8 @@
 
   (fn interact! [self player]
     (if player.state.holding
-        ($ui:open-textbox! {:text "I need to put down what I'm holding first."})
+        ($ui:open-textbox! {:nametag player.state.name
+                            :text "I need to put down what I'm holding first."})
         ($ui:open-menu! {:options [{:text "Tuna Sandwich" :action #(player:hold-item! {:item :tuna-sandwich})}
                                    {:text "Nevermind."}]})
         )

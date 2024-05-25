@@ -41,8 +41,8 @@
       (tset self :state :dy dy)
       (tset self :state :walking? (not (and (= 0 dx) (= 0 dy))))
 
-      (if (playdate.buttonJustPressed playdate.kButtonB)
-          (scene-manager:select! :menu))
+      ;; (if (playdate.buttonJustPressed playdate.kButtonB)
+      ;;     (scene-manager:select! :menu))
       (if (and (playdate.buttonJustPressed playdate.kButtonA)
                facing-sprite)
           (facing-sprite:interact! self)
@@ -83,7 +83,7 @@
   (fn collisionResponse [self other]
     (other:collisionResponse))
 
-  (fn new! [x y {: tile-w : tile-h}]
+  (fn new! [x y {: tile-w : tile-h :layer-details { : name}}]
     (let [image (gfx.imagetable.new :assets/images/princess)
           animation (anim.new {: image :states [
           {:state :down.standing
@@ -146,7 +146,7 @@
       (tset player :take-held take-held)
       (tset player :hold-item! hold-item!)
       (tset player :modify-item! modify-item!)
-      (tset player :state {:facing :down : animation :speed 2 :dx 0 :dy 0 :visible true :cash 0})
+      (tset player :state {: name :facing :down : animation :speed 2 :dx 0 :dy 0 :visible true :cash 0})
       (tile.add! player {: tile-h : tile-w})
       player)))
 

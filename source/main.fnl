@@ -12,6 +12,7 @@
 (pd/import :CoreLibs/graphics)
 (pd/import :CoreLibs/sprites)
 (pd/import :CoreLibs/timer)
+(pd/import :CoreLibs/keyboard)
 
 (global $config {:debug true})
 

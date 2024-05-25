@@ -11,9 +11,11 @@
     (if player.state.holding
         (do
           (player:modify-item! :chocolate)
-          ($ui:open-textbox! {:text "Added a pump of chocolate."})
+          ($ui:open-textbox! {:nametag player.state.name
+                              :text "Added a pump of chocolate."})
           )
-        ($ui:open-textbox! {:text "I'm not holding anything yet."}))
+        ($ui:open-textbox! {:nametag player.state.name
+                            :text "I'm not holding anything yet."}))
     )
 
   ;; (fn collisionResponse [self other]

@@ -9,10 +9,12 @@
 
   (fn interact! [self player]
     (if player.state.holding
-        ($ui:open-textbox! {:text "I need to put down what I'm holding first."})
+        ($ui:open-textbox! {:nametag player.state.name
+                            :text "I need to put down what I'm holding first."})
         (do
           (player:hold-item! {:item :milk})
-          ($ui:open-textbox! {:text "Grabbed milk."})
+          ($ui:open-textbox! {:nametag player.state.name
+                              :text "Grabbed milk."})
           )
         )
     )

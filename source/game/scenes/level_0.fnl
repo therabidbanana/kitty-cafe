@@ -15,7 +15,7 @@
       (tset t i 0))
     t)
 
-  (fn enter! [$]
+  (fn enter! [$ {: name &as game-state}]
     (let [
           ;; Option 1 - Loads at runtime
           ;; loaded (prepare-level! (ldtk.load-level {:level 0}) entity-map)
@@ -30,6 +30,7 @@
                                                      :line { : node-list : grid-w : locations}
                                                      :wait { : node-list : grid-w : locations}
                                                      :exit { : node-list : grid-w : locations}
+                                                     :player { : name }
                                                      :npc { : patrons }
                                                      :appliances {:z-index 0}
                                                      :entrance { :spawn (?. entity-map :npc) }
@@ -51,6 +52,7 @@
       (clock:add)
       ;; (inspect {:x wait-node.x :y wait-node.y})
       (tset $ :state {: graph : locations : graph-locations : grid-w
+                      :player-name name
                       :ticks 1 :seconds 0 })
       loaded
       )
