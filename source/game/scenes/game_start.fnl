@@ -28,6 +28,7 @@
                           :id start-time
                           :day 1
                           :stock {:milk 20 :tuna-sandwich 10
+                                  :strawberry-cake 2 :cherry-danish 1
                                   :chocolate 15 :vanilla 15}}]
       (tset $ :state new-game-state)
       (scene-manager:reset-state! new-game-state)

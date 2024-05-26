@@ -30,7 +30,7 @@
       1 [(random-milk) (random-milk) (random-milk)]
       2 [(random-milk) (random-milk)]
       3 [(random-pastry)]
-      ;; 4 [(random-pastry)]
+      4 [(random-pastry)]
       5 [(random-milk) (random-pastry)]
       6 [(random-milk) (random-pastry)]
       _ [(random-milk)])
