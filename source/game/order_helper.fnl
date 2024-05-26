@@ -13,14 +13,20 @@
        :modifiers modifier}))
 
   (fn random-pastry []
-    {:item :tuna-sandwich
-     :modifiers []})
+    (case (math.random 1 7)
+      1 {:item :cherry-danish
+         :modifiers []}
+      2 {:item :strawberry-cake
+         :modifiers []}
+      _ {:item :tuna-sandwich
+       :modifiers []}))
 
   (fn generate-order []
     (case (math.random 1 7)
       1 [(random-milk) (random-milk) (random-milk)]
       2 [(random-milk) (random-milk)]
       3 [(random-pastry)]
+      4 [(random-milk) (random-pastry)]
       _ [(random-milk)])
     )
 
@@ -29,6 +35,8 @@
       (case item
         :milk (+ 2 modifier-value)
         :tuna-sandwich (+ 7 modifier-value)
+        :cherry-danish (+ 3 modifier-value)
+        :strawberry-cake (+ 4 modifier-value)
         _ 0)))
 
   (fn describe-item [full-item]
@@ -37,6 +45,8 @@
         (let [{: item : modifiers} full-item
               item-readable (case item
                               :tuna-sandwich "tuna sandwich"
+                              :cherry-danish "cherry danish"
+                              :strawberry-cake "strawberry cake"
                               other other)
               mods (or modifiers [])
               sorted (table.sort mods)]

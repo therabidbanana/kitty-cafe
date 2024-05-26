@@ -14,7 +14,7 @@
 (pd/import :CoreLibs/timer)
 (pd/import :CoreLibs/keyboard)
 
-(global $config {:debug true})
+(global $config {:debug false})
 
 (let [{: scene-manager} (require :source.lib.core)]
   (scene-manager:load-scenes! (require :source.game.scenes))

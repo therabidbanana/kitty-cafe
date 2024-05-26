@@ -61,6 +61,20 @@
     (self:markDirty)
     )
 
+  (fn can-fulfill? [{:state {: stock} &as self} order]
+    (let [required {}
+          _ (each [i v (ipairs order)]
+              (tset required v.item (+ (or (?. required v.item) 0) 1))
+
+              (each [k j (ipairs v.modifiers)]
+                (tset required j (+ (or (?. required j) 0) 1))
+                ))
+          ]
+      (var unfulfilled 0)
+      (each [k v (pairs required)]
+        (if (< (or (?. stock k) 0) v) (set unfulfilled (+ 1 unfulfilled))))
+      (= unfulfilled 0)))
+
   (fn take-held [{:state {: holding} &as self}]
     (tset self :state :holding nil)
     holding)
@@ -83,7 +97,7 @@
 
   (fn modify-item! [{:state {: holding : stock} &as self} modifier]
     (let [modifiers (or (?. holding :modifiers) [])
-          curr-stock (or (?. stock (?. holding :item)) 0)]
+          curr-stock (or (?. stock modifier) 0)]
       (if (> curr-stock 0)
           (do
             (tset self :state :stock modifier (- curr-stock 1))
@@ -160,6 +174,7 @@
       (tset player :update update)
       (tset player :react! react!)
       (tset player :take-held take-held)
+      (tset player :can-fulfill? can-fulfill?)
       (tset player :hold-item! hold-item!)
       (tset player :modify-item! modify-item!)
       (tset player :state {: name :facing :down : animation :speed 2 :dx 0 :dy 0 :visible true :cash 0})

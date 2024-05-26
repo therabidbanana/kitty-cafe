@@ -78,7 +78,7 @@
           (tset $ :state :seconds seconds)
           (tset $ :state :speed speed)
           (tset $ :state :cranked cranked)
-          (if (> $.state.seconds (* 60 (* 2 60)))
+          (if (> $.state.seconds (* 60 (* 2 60))) ;; 8 hours of day
               (do
                 (tset game-state :day-cash $.state.player.state.cash)
                 ($ui:open-textbox! {:text "Looks like it's about time to close up shop for the day."

@@ -12,7 +12,7 @@
 
   (fn buy-item [game-state item quantity price]
     (when (>= game-state.savings price)
-      (let [curr-stock (?. game-state.stock item)
+      (let [curr-stock (or (?. game-state.stock item) 0)
             new-stock (+ quantity curr-stock)
             new-cash (- game-state.savings price)]
         (tset game-state :stock item new-stock)
@@ -64,6 +64,14 @@
                          :price 10
                          :keep-open? true
                          :text "Vanillax100 ($10)" :action (fn [] (buy-item game-state :vanilla 100 10))}
+                        {:item :cherry-danish
+                         :price 2
+                         :keep-open? true
+                         :text "Cherry Danish ($2)" :action (fn [] (buy-item game-state :cherry-danish 1 2))}
+                        {:item :strawberry-cake
+                         :price 25
+                         :keep-open? true
+                         :text "Berry Cakex8 ($25)" :action (fn [] (buy-item game-state :strawberry-cake 8 25))}
                         {:item :tuna-sandwich
                          :price 5
                          :keep-open? true

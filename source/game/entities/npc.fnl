@@ -152,7 +152,8 @@
 
   (fn interact! [self player]
     (let [order self.state.cafe-order
-          hold  player.state.holding]
+          hold  player.state.holding
+          in-stock? (player:can-fulfill? order)]
       (if (self:takes-item-from? player)
           (let [taken (self:take-item-from! player)]
             (if (= (type (next self.state.cafe-order)) "nil")
@@ -165,10 +166,17 @@
           ($ui:open-textbox! {:text "I don't think that's what I ordered."})
           (= self.state.state :leave)
           ($ui:open-textbox! {:text "I'm just standing here because I can't walk away yet [bug]."})
-          ;;
-          ($ui:open-textbox! {:text (.. "Can I get... "
-                                        (order_helper.describe-items self.state.cafe-order)
-                                        "?")})
+          (if in-stock?
+              ($ui:open-textbox! {:text (.. "Can I get... "
+                                            (order_helper.describe-items self.state.cafe-order)
+                                            "?")
+                                  :action #($ui:open-textbox! {:nametag player.state.name :text "Sure thing!"})
+                                  })
+              ($ui:open-textbox! {:text (.. "Can I get... "
+                                            (order_helper.describe-items self.state.cafe-order)
+                                            "?")
+                                  :action #($ui:open-textbox! {:nametag player.state.name :text "Sorry, we're out!"
+                                                               :action (fn [] (self:transition! :leave))})}))
           )
       )
     )

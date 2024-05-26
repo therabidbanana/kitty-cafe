@@ -5,17 +5,23 @@
    scene-manager (require :source.lib.scene-manager)
    tile (require :source.lib.behaviors.tile-movement)
    $ui (require :source.lib.ui)
+   order_helper (require :source.game.order_helper)
    ]
 
   (fn interact! [self player]
     (if player.state.holding
         ($ui:open-textbox! {:nametag player.state.name
                             :text "I need to put down what I'm holding first."})
-        ($ui:open-menu! {:options [{:text "Tuna Sandwich"
-                                    :action #(if (player:hold-item! {:item :tuna-sandwich})
-                                                 true
-                                                 ($ui:open-textbox! {:text "I'm out."}))}
-                                   {:text "Nevermind."}]})
+        ($ui:open-menu!
+         {:options (icollect [i v (ipairs [:tuna-sandwich :strawberry-cake :cherry-danish :nevermind])]
+                     (if (= v :nevermind)
+                         {:text "Nope"}
+                         (> (or (?. player.state.stock v) 0) 0)
+                         {:text (order_helper.describe-item {:item v})
+                          :action #(if (player:hold-item! {:item v})
+                                       true
+                                       ($ui:open-textbox! {:text "I'm out."}))})
+                     )})
         )
     )
 
