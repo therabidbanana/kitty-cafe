@@ -8,19 +8,23 @@
       gfx pd.graphics]
 
   (local state {})
-  (fn enter! [$]
-    ($ui:open-textbox! {:text ""})
-    ;; (tset $ :state :listview (testScroll pd gfx))
+  (fn enter! [$ game-state]
+    (tset $ :state {:day (or (?. game-state :day) 1)})
+    ($ui:open-textbox! {:nametag (.. "Day " $.state.day)
+                        :text (.. "Almost 7am... time to open up the shop!")
+                        :action #(scene-manager:select! :level_0)})
     )
-  (fn exit! [$]
+
+  (fn exit! [$ game-state]
+    (tset game-state :day $.state.day)
     (tset $ :state {}))
-  (fn tick! [{:state {: listview} &as $}]
-    ;; (listview:drawInRect 180 20 200 200)
-    (if ($ui:active?) ($ui:tick!)
-        ))
-  (fn draw! [{:state {: listview} &as $}]
+
+  (fn tick! [{: state &as $}]
+    (if ($ui:active?) ($ui:tick!))
+    )
+
+  (fn draw! [{: state &as $}]
     ($ui:render!)
-    ;; (listview:drawInRect 180 20 200 200)
     )
   )
 

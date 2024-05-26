@@ -4,6 +4,7 @@
 (deflevel :level_0
   [entity-map (require :source.game.entities.core)
    ;; ldtk (require :source.lib.ldtk.loader)
+   scene-manager (require :source.lib.scene-manager)
    {: prepare-level!} (require :source.lib.level)
    $ui (require :source.lib.ui)
    pd playdate
@@ -52,15 +53,17 @@
       (clock:add)
       ;; (inspect {:x wait-node.x :y wait-node.y})
       (tset $ :state {: graph : locations : graph-locations : grid-w
-                      :player-name name
+                      :player-name name : player
                       :ticks 1 :seconds 0 })
       loaded
       )
     )
 
-  (fn exit! [$])
+  (fn exit! [$]
+    (tset $ :state {})
+    )
 
-  (fn tick! [$]
+  (fn tick! [$ game-state]
     (if ($ui:active?) ($ui:tick!)
         (let [(change acceleratedChange) (playdate.getCrankChange)
               cranked (+ (or $.state.cranked 0) acceleratedChange)
@@ -72,6 +75,13 @@
           (tset $ :state :seconds seconds)
           (tset $ :state :speed speed)
           (tset $ :state :cranked cranked)
+          (if (> $.state.seconds (* 60 (* 2 60)))
+              (do
+                (tset game-state :day-cash $.state.player.state.cash)
+                ($ui:open-textbox! {:text "Looks like it's about time to close up shop for the day."
+                                    :action #(scene-manager:select! :day_end)})
+                )
+              )
           (gfx.sprite.performOnAllSprites (fn react-each [ent]
                                             (if (?. ent :react!) (ent:react! $.state)))))))
   (fn draw! [$]

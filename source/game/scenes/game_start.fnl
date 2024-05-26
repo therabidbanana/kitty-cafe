@@ -10,12 +10,14 @@
   (fn get-name [{: state}]
     (set playdate.keyboard.keyboardWillHideCallback (fn [save]
                                                       (if save (tset state :name playdate.keyboard.text))
-                                                      (scene-manager:select! :level_0)))
+                                                      (scene-manager:select! :day_start)))
     (playdate.keyboard.show state.name)
     )
 
   (fn enter! [$]
-    (let [new-game-state {:name "Kate"}]
+    (let [new-game-state {:name "Kate"
+                          :stock {:milk 100 :tuna-sandwich 12
+                                  :chocolate 100 :vanilla 100}}]
       (tset $ :state new-game-state)
       (scene-manager:reset-state! new-game-state)
       (tset playdate.keyboard :text new-game-state.name)
@@ -40,7 +42,8 @@
       (gfx.setColor gfx.kColorBlack)
       (gfx.drawRoundRect rect 4)
       (gfx.setColor gfx.kColorBlack)
-      (gfx.drawText (or (?. playdate :keyboard :text) state.name) 16 12))
+      (gfx.drawText (or (?. playdate :keyboard :text) state.name) 16 12)
+      )
     (if ($ui:active?) ($ui:tick!))
     )
   (fn draw! [{:state {: listview} &as $}]
