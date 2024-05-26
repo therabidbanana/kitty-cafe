@@ -11,17 +11,18 @@
 
 
   (fn buy-item [game-state item quantity price]
-    (when (>= game-state.day-cash price)
+    (when (>= game-state.savings price)
       (let [curr-stock (?. game-state.stock item)
             new-stock (+ quantity curr-stock)
-            new-cash (- game-state.day-cash price)]
+            new-cash (- game-state.savings price)]
         (tset game-state :stock item new-stock)
-        (tset game-state :day-cash new-cash)
+        (tset game-state :savings new-cash)
         )
       ))
 
   (fn enter! [$ game-state]
-    (fn restock [$ game-state]
+    (fn restock [$ game-state day-cash]
+      (tset game-state :savings (+ (or (?. game-state :savings) 0) day-cash))
       ($ui:open-menu! {
                        :on-draw (fn [comp selected]
                                   (let [rect (playdate.geometry.rect.new 280 40
@@ -33,7 +34,7 @@
                                     (gfx.setColor gfx.kColorBlack)
                                     (gfx.drawRoundRect rect 4)
                                     (gfx.setColor gfx.kColorBlack)
-                                    (gfx.drawText (.. "cash: " (or (?. game-state.day-cash) 0)) 286 42)
+                                    (gfx.drawText (.. "cash: " (or (?. game-state.savings) 0)) 286 42)
                                     )
                                   (let [rect (playdate.geometry.rect.new 280 10
                                                                          120 20)
@@ -46,6 +47,8 @@
                                     (gfx.setColor gfx.kColorBlack)
                                     (gfx.drawText (.. "Have: " (or (?. game-state.stock selected.item) 0)) 286 12)
                                     )
+                                  (gfx.drawText (.. "Rent due: $3000") 220 180)
+                                  (gfx.drawText (.. "in " (- 30 game-state.day) " days") 220 210)
                                   )
                        :options
                        [
@@ -65,18 +68,21 @@
                          :price 5
                          :keep-open? true
                          :text "Tuna Sand ($5)" :action (fn [] (buy-item game-state :tuna-sandwich 1 5))}
-                        {:text "Done" :action #(scene-manager:select! :day_start)}
+                        {:text "Done" :action #(if (>= game-state.day 30)
+                                                   (scene-manager:select! :game_end)
+                                                   (scene-manager:select! :day_start))}
                         ]
                        })
       )
     (tset $ :state {:day (or (?. game-state :day) 1)})
     ($ui:open-textbox! {:nametag (.. "Day " $.state.day)
                         :text (.. "Alrighty, all cleaned up. Looks like I made $" game-state.day-cash " today.")
-                        :action #(restock $ game-state)})
+                        :action #(restock $ game-state game-state.day-cash)})
     )
 
   (fn exit! [$ game-state]
     (tset game-state :day (+ $.state.day 1))
+    (tset game-state :day-cash 0)
     (tset $ :state {}))
 
   (fn tick! [{: state &as $}]

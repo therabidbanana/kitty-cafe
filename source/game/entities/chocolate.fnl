@@ -10,9 +10,12 @@
   (fn interact! [self player]
     (if player.state.holding
         (do
-          (player:modify-item! :chocolate)
-          ($ui:open-textbox! {:nametag player.state.name
-                              :text "Added a pump of chocolate."})
+          (if (player:modify-item! :chocolate)
+              ($ui:open-textbox! {:nametag player.state.name
+                                  :text "Added a pump of chocolate."})
+              ($ui:open-textbox! {:nametag player.state.name
+                                  :text "I'm out of chocolate."})
+              )
           )
         ($ui:open-textbox! {:nametag player.state.name
                             :text "I'm not holding anything yet."}))

@@ -69,13 +69,29 @@
     (tset self :state :cash (+ (or cash 0) paid))
     )
 
-  (fn hold-item! [{:state {: holding} &as self} item]
-    (tset self :state :holding item))
+  (fn hold-item! [{:state {: holding : stock} &as self} item]
+    (if (= (type item) "nil")
+        (tset self :state :holding nil)
+        (let [curr-stock (or (?. stock item.item) 0)]
+          (if (> curr-stock 0)
+              (do
+                (tset self :state :stock item.item (- curr-stock 1))
+                (tset self :state :holding item)
+                true)
+              false)))
+    )
 
-  (fn modify-item! [{:state {: holding} &as self} modifier]
+  (fn modify-item! [{:state {: holding : stock} &as self} modifier]
     (let [modifiers (or (?. holding :modifiers) [])
-          _ (table.insert modifiers modifier)]
-      (tset self :state :holding :modifiers modifiers)))
+          curr-stock (or (?. stock (?. holding :item)) 0)]
+      (if (> curr-stock 0)
+          (do
+            (tset self :state :stock modifier (- curr-stock 1))
+            (table.insert modifiers modifier)
+            (tset self :state :holding :modifiers modifiers)
+            true)
+          false)
+      ))
 
   (fn draw [{:state {: animation : dx : dy : visible : walking?} &as self} x y w h]
     (animation:draw x y))

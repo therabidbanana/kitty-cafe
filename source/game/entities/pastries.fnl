@@ -11,7 +11,10 @@
     (if player.state.holding
         ($ui:open-textbox! {:nametag player.state.name
                             :text "I need to put down what I'm holding first."})
-        ($ui:open-menu! {:options [{:text "Tuna Sandwich" :action #(player:hold-item! {:item :tuna-sandwich})}
+        ($ui:open-menu! {:options [{:text "Tuna Sandwich"
+                                    :action #(if (player:hold-item! {:item :tuna-sandwich})
+                                                 true
+                                                 ($ui:open-textbox! {:text "I'm out."}))}
                                    {:text "Nevermind."}]})
         )
     )

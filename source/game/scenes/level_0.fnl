@@ -49,6 +49,7 @@
           hud (entity-map.hud.new! player)
           clock (entity-map.clock.new! $)
           ]
+      (tset player.state :stock game-state.stock)
       (hud:add)
       (clock:add)
       ;; (inspect {:x wait-node.x :y wait-node.y})

@@ -12,9 +12,11 @@
         ($ui:open-textbox! {:nametag player.state.name
                             :text "I need to put down what I'm holding first."})
         (do
-          (player:hold-item! {:item :milk})
-          ($ui:open-textbox! {:nametag player.state.name
-                              :text "Grabbed milk."})
+          (if (player:hold-item! {:item :milk})
+              ($ui:open-textbox! {:nametag player.state.name
+                                  :text "Grabbed milk."})
+              ($ui:open-textbox! {:nametag player.state.name
+                                  :text "I'm out of that."}))
           )
         )
     )
