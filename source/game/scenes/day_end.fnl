@@ -76,7 +76,7 @@
                          :price 5
                          :keep-open? true
                          :text "Tuna Sando ($5)" :action (fn [] (buy-item game-state :tuna-sandwich 1 5))}
-                        {:text "Done" :action #(if (>= game-state.day 3)
+                        {:text "Done" :action #(if (>= game-state.day 30)
                                                    (scene-manager:select! :game_end)
                                                    (scene-manager:select! :day_start))}
                         ]

@@ -4,10 +4,12 @@
   []
 
   (fn random-milk []
-    (let [modifier (case (math.random 1 6)
+    (let [modifier (case (math.random 1 9)
                      1 [:chocolate]
                      2 [:vanilla]
-                     3 [:chocolate :vanilla]
+                     3 [:chocolate]
+                     4 [:vanilla]
+                     5 [:chocolate :vanilla]
                      _ [])]
       {:item :milk
        :modifiers modifier}))
