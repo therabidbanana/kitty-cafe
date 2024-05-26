@@ -13,20 +13,26 @@
        :modifiers modifier}))
 
   (fn random-pastry []
-    (case (math.random 1 7)
+    (case (math.random 1 9)
       1 {:item :cherry-danish
          :modifiers []}
-      2 {:item :strawberry-cake
+      2 {:item :cherry-danish
+         :modifiers [:chocolate]}
+      3 {:item :strawberry-cake
          :modifiers []}
+      4 {:item :strawberry-cake
+         :modifiers [:chocolate]}
       _ {:item :tuna-sandwich
        :modifiers []}))
 
   (fn generate-order []
-    (case (math.random 1 7)
+    (case (math.random 1 9)
       1 [(random-milk) (random-milk) (random-milk)]
       2 [(random-milk) (random-milk)]
       3 [(random-pastry)]
-      4 [(random-milk) (random-pastry)]
+      ;; 4 [(random-pastry)]
+      5 [(random-milk) (random-pastry)]
+      6 [(random-milk) (random-pastry)]
       _ [(random-milk)])
     )
 

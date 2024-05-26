@@ -153,11 +153,14 @@
   (fn interact! [self player]
     (let [order self.state.cafe-order
           hold  player.state.holding
+          sounds self.state.sounds
           in-stock? (player:can-fulfill? order)]
       (if (self:takes-item-from? player)
           (let [taken (self:take-item-from! player)]
             (if (= (type (next self.state.cafe-order)) "nil")
-                ($ui:open-textbox! {:text "Thanks! Have a nice day!"})
+                (do
+                  (sounds.thank-you:play)
+                  ($ui:open-textbox! {:text "Thanks! Have a nice day!"}))
                 ($ui:open-textbox! {:text (.. "Thanks! I'm still waiting for... "
                                               (order_helper.describe-items self.state.cafe-order))})
                 )
@@ -167,16 +170,20 @@
           (= self.state.state :leave)
           ($ui:open-textbox! {:text "I'm just standing here because I can't walk away yet [bug]."})
           (if in-stock?
-              ($ui:open-textbox! {:text (.. "Can I get... "
-                                            (order_helper.describe-items self.state.cafe-order)
-                                            "?")
-                                  :action #($ui:open-textbox! {:nametag player.state.name :text "Sure thing!"})
-                                  })
-              ($ui:open-textbox! {:text (.. "Can I get... "
-                                            (order_helper.describe-items self.state.cafe-order)
-                                            "?")
-                                  :action #($ui:open-textbox! {:nametag player.state.name :text "Sorry, we're out!"
-                                                               :action (fn [] (self:transition! :leave))})}))
+              (do
+                (sounds.can-i-order:play)
+                ($ui:open-textbox! {:text (.. "Can I get... "
+                                              (order_helper.describe-items self.state.cafe-order)
+                                              "?")
+                                    :action #($ui:open-textbox! {:nametag player.state.name :text "Sure thing!"})
+                                    }))
+              (do
+                (sounds.can-i-order:play)
+                ($ui:open-textbox! {:text (.. "Can I get... "
+                                             (order_helper.describe-items self.state.cafe-order)
+                                             "?")
+                                   :action #($ui:open-textbox! {:nametag player.state.name :text "Sorry, we're out!"
+                                                                :action (fn [] (self:transition! :leave))})})))
           )
       )
     )
@@ -185,9 +192,12 @@
   ;;   (other:collisionResponse))
 
   (fn new! [x y {: tile-h : tile-w }]
-    (let [image (case (math.random 1 2)
-                  1 (gfx.imagetable.new :assets/images/patron1)
-                  _ (gfx.imagetable.new :assets/images/patron2))
+    (let [patron (case (math.random 1 2)
+                   1 :patron1
+                   _ :patron2)
+          image (case (math.random 1 2)
+                  1 (gfx.imagetable.new (.. :assets/images/ patron))
+                  _ (gfx.imagetable.new (.. :assets/images/ patron)))
           animation (anim.new {: image :states [
           {:state :down.standing
            :start (+ 1 dirs.down) :end (+ 1 dirs.down)
@@ -253,6 +263,8 @@
       (tset player :take-item-from! take-item-from!)
       (tset player :state {: animation :speed 2 :dx 0 :dy 0 :visible true
                            :cafe-order (generate-order)
+                           :sounds {:thank-you (playdate.sound.sampleplayer.new (.. :assets/sounds/thank-you- patron))
+                                    :can-i-order (playdate.sound.sampleplayer.new (.. :assets/sounds/can-i-order- patron))}
                            :pause-ticks 0
                            :facing :down
                            :state :order

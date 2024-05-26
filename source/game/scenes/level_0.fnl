@@ -18,11 +18,9 @@
 
   (fn enter! [$ {: name &as game-state}]
     (let [
-          ;; Option 1 - Loads at runtime
-          ;; loaded (prepare-level! (ldtk.load-level {:level 0}) entity-map)
-          ;; Option 2 - relies on deflevel compiling
+          music-loop (playdate.sound.fileplayer.new :assets/sounds/8bit-bossa-nova)
           tile-size 16
-          grid-w (inspect (// level_0.w tile-size))
+          grid-w (// level_0.w tile-size)
           grid-h (// level_0.h tile-size)
           node-list (-node-list! (* grid-w grid-h))
           locations {}
@@ -50,6 +48,9 @@
           holding (entity-map.holding_hud.new! player)
           clock (entity-map.clock.new! $)
           ]
+      (doto music-loop
+        (: :setVolume 0.5)
+        (: :play 0))
       (tset player.state :stock game-state.stock)
       (hud:add)
       (holding:add)
@@ -57,12 +58,14 @@
       ;; (inspect {:x wait-node.x :y wait-node.y})
       (tset $ :state {: graph : locations : graph-locations : grid-w
                       :player-name name : player
+                      :music music-loop
                       :ticks 1 :seconds 0 })
       loaded
       )
     )
 
   (fn exit! [$]
+    ($.state.music:stop)
     (tset $ :state {})
     )
 

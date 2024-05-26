@@ -13,6 +13,12 @@ Fennel is a Lua based lisp - https://fennel-lang.org/
 
 The Playdate is a tiny handheld game system that can be easily programmed in Lua.
 
+# Assets
+
+* Art created in Pixelorama for the game jam
+* Bossa Nova cafe music from https://opengameart.org/content/bossa-nova
+
+
 # Build Process
 
 Assuming lua, fennel, pdc and playdate (simulator) are set up on your PATH, the Makefile should handle this with "make launch".
