@@ -55,7 +55,7 @@
                         {:item :milk
                          :price 2
                          :keep-open? true
-                         :text "Milk ($2)" :action (fn [] (buy-item game-state :milk 1 2))}
+                         :text "Milk ($1)" :action (fn [] (buy-item game-state :milk 1 1))}
                         {:item :chocolate
                          :price 10
                          :keep-open? true
@@ -67,7 +67,7 @@
                         {:item :tuna-sandwich
                          :price 5
                          :keep-open? true
-                         :text "Tuna Sand ($5)" :action (fn [] (buy-item game-state :tuna-sandwich 1 5))}
+                         :text "Tuna Sando ($5)" :action (fn [] (buy-item game-state :tuna-sandwich 1 5))}
                         {:text "Done" :action #(if (>= game-state.day 30)
                                                    (scene-manager:select! :game_end)
                                                    (scene-manager:select! :day_start))}

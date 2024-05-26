@@ -16,7 +16,7 @@
 
   (fn enter! [$]
     (let [new-game-state {:name "Kate"
-                          :stock {:milk 100 :tuna-sandwich 12
+                          :stock {:milk 40 :tuna-sandwich 10
                                   :chocolate 100 :vanilla 100}}]
       (tset $ :state new-game-state)
       (scene-manager:reset-state! new-game-state)

@@ -8,12 +8,13 @@
       exit    (require :source.game.entities.exit)
       entrance    (require :source.game.entities.entrance)
       hud    (require :source.game.entities.hud)
+      holding_hud    (require :source.game.entities.holding_hud)
       clock    (require :source.game.entities.clock)
       trash    (require :source.game.entities.trash)
       vanilla    (require :source.game.entities.vanilla)
       chocolate    (require :source.game.entities.chocolate)
       ]
-  {: player : npc : hud : clock
+  {: player : npc : hud : holding_hud : clock
    : order : milk : trash : pastries
    : vanilla : chocolate
    : line : wait : exit : entrance})

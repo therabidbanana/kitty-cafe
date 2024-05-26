@@ -47,10 +47,12 @@
           player (?. (icollect [_ v (ipairs loaded.entities)]
                        (if (?. v :player?) v)) 1)
           hud (entity-map.hud.new! player)
+          holding (entity-map.holding_hud.new! player)
           clock (entity-map.clock.new! $)
           ]
       (tset player.state :stock game-state.stock)
       (hud:add)
+      (holding:add)
       (clock:add)
       ;; (inspect {:x wait-node.x :y wait-node.y})
       (tset $ :state {: graph : locations : graph-locations : grid-w
