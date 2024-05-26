@@ -1,22 +1,20 @@
 (import-macros {: inspect : defns} :source.lib.macros)
 
-(defns day-start
+(defns scene
   [{:player player-ent} (require :source.game.entities.core)
       scene-manager (require :source.lib.scene-manager)
       $ui (require :source.lib.ui)
       pd playdate
       gfx pd.graphics]
 
-  (local state {})
   (fn enter! [$ game-state]
-    (let [game-id game-state.id
-          saved   (playdate.datastore.write game-state game-id)]
-      ($ui:open-textbox! {:nametag (.. "Day " game-state.day)
-                          :text (.. "Almost 7am... time to open up the shop!")
-                          :action #(scene-manager:select! :level_0)}))
+    (let []
+      ($ui:open-textbox! {:text "Now where was I?"
+                          :action #(scene-manager:select! :day_start)})
+      )
     )
 
-  (fn exit! [$ game-state]
+  (fn exit! [$]
     (tset $ :state {}))
 
   (fn tick! [{: state &as $}]

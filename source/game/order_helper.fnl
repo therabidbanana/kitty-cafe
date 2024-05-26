@@ -26,7 +26,7 @@
        :modifiers []}))
 
   (fn generate-order []
-    (case (math.random 1 9)
+    (case (math.random 1 10)
       1 [(random-milk) (random-milk) (random-milk)]
       2 [(random-milk) (random-milk)]
       3 [(random-pastry)]

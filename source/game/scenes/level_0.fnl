@@ -49,7 +49,7 @@
           clock (entity-map.clock.new! $)
           ]
       (doto music-loop
-        (: :setVolume 0.5)
+        (: :setVolume 0.3)
         (: :play 0))
       (tset player.state :stock game-state.stock)
       (hud:add)

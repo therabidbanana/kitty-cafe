@@ -9,6 +9,11 @@
 
   (local state {})
   (fn enter! [$ game-state]
+    (let [game-saves (playdate.datastore.read)
+          saves (icollect [i v (ipairs game-saves.saves)]
+                  (if (not (= v.id game-state.id)) v))]
+      (playdate.datastore.write {: saves})
+      (playdate.datastore.delete game-state.id))
     (if (> game-state.savings 3000)
         ($ui:open-textbox! {:text (.. "I have enough to make rent! The cafe will make it another month.")
                             :action #(scene-manager:select! :menu)})

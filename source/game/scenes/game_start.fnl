@@ -8,14 +8,25 @@
       gfx pd.graphics]
 
   (fn get-name [{: state}]
-    (set playdate.keyboard.keyboardWillHideCallback (fn [save]
-                                                      (if save (tset state :name playdate.keyboard.text))
-                                                      (scene-manager:select! :day_start)))
+    (set playdate.keyboard.keyboardWillHideCallback
+         (fn [save]
+           (if save (tset state :name playdate.keyboard.text))
+           ))
+    (set playdate.keyboard.keyboardDidHideCallback
+         (fn []
+           (let [curr-state (or (playdate.datastore.read) {:saves []})]
+             (table.insert curr-state.saves state)
+             (playdate.datastore.write curr-state)
+             (scene-manager:select! :day_start))
+           ))
     (playdate.keyboard.show state.name)
     )
 
-  (fn enter! [$]
-    (let [new-game-state {:name "Kate"
+  (fn enter! [$ game-state]
+    (let [(start-time millis) (playdate.getSecondsSinceEpoch)
+          new-game-state {:name "Kate"
+                          :id start-time
+                          :day 1
                           :stock {:milk 20 :tuna-sandwich 10
                                   :chocolate 15 :vanilla 15}}]
       (tset $ :state new-game-state)

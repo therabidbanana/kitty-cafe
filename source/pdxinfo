@@ -1,8 +1,8 @@
-name=Fennel test
+name=Kitty Cafe
 author=therabidbanana
-description=Fennel Test Game
-bundleID=com.davidhaslem.fennel-test
+description=Princess Kitty Cafe
+bundleID=com.davidhaslem.kitty-cafe
 version=1.0
 buildNumber=1
-imagePath=assets
-launchSoundPath=
+imagePath=assets/images
+launchSoundPath=assets/sounds/thank-you-patron1
