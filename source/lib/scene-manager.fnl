@@ -33,6 +33,7 @@
 
   (fn tick! [{: active &as $}]
     (if (and active (?. active :tick!)) (active:tick! $.game-state))
+    (playdate.timer:updateTimers)
     (animation.blinker.updateAll)
     )
 
