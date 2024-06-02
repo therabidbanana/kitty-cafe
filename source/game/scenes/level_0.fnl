@@ -89,7 +89,7 @@
                 )
               )
           (gfx.sprite.performOnAllSprites (fn react-each [ent]
-                                            (if (?. ent :react!) (ent:react! $.state)))))))
+                                            (if (?. ent :react!) (ent:react! $.state game-state)))))))
   (fn draw! [$]
     ;; ($.layer.tilemap:draw 0 0)
     ($ui:render!)
