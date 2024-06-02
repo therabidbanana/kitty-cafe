@@ -52,8 +52,8 @@
     )
 
 
-  (fn add-entities! [{: tile-h : tile-w &as layer} entity-map layer-details]
-    (icollect [_ {: id : width : height : x : y : fields} (ipairs layer.entities)]
+  (fn add-entities! [{: tile-h : tile-w &as layer} entity-map layer-details all-entities]
+    (icollect [_ {: id : width : height : x : y : fields} (ipairs layer.entities) &into all-entities]
       (let [entity-mod (?. entity-map id)
             ;; NOTE: Skips unknown entities instead of error
             entity (if entity-mod
@@ -71,13 +71,14 @@
                     (?. (icollect [_ v (ipairs (. layer :layer-enums))] (if (= "wall" v) true)) 1)
                     (tile-layer-sprite layer true layer-details)
                     (tile-layer-sprite layer false layer-details)))
-          entities (?. loaded :entity-layers 1)
-          entities (add-entities! entities entity-map layer-details)]
+          all-entities []]
+      (each [k v (ipairs (?. loaded :entity-layers))]
+        (add-entities! v entity-map layer-details all-entities))
       {
        :stage-width loaded.w :stage-height loaded.h
        :ticks 0
        : layers
-       : entities
+       :entities all-entities
        }))
 
   )

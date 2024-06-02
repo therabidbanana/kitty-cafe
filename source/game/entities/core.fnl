@@ -13,8 +13,12 @@
       trash    (require :source.game.entities.trash)
       vanilla    (require :source.game.entities.vanilla)
       chocolate    (require :source.game.entities.chocolate)
+      sandwich_window (require :source.game.entities.sandwich_window)
+      danish_window (require :source.game.entities.danish_window)
+      cake_window (require :source.game.entities.cake_window)
       ]
   {: player : npc : hud : holding_hud : clock
    : order : milk : trash : pastries
    : vanilla : chocolate
+   : sandwich_window : cake_window : danish_window
    : line : wait : exit : entrance})
