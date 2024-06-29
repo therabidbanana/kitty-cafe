@@ -32,6 +32,7 @@
 (fn defns [ns-name bindings & forms]
   (let [names (icollect [_ [t name & def] (ipairs forms)]
                 (if (= t (sym :local)) name
+                    (= t (sym :var)) name
                     (= t (sym :fn)) name))
         map (collect [_ name (ipairs names)]
               (values (tostring name) name))]
@@ -48,6 +49,7 @@
 (fn defmodule [module bindings & forms]
   (let [names (icollect [_ [t name & def] (ipairs forms)]
                 (if (= t (sym :local)) name
+                    (= t (sym :var)) name
                     (= t (sym :fn)) name))
         map (collect [_ name (ipairs names)]
               (values (tostring name) name))]

@@ -88,6 +88,16 @@
       )
     )
 
+  (fn drawText [text & rest]
+    (let [curr-font (love.graphics.getFont)]
+      (case rest
+        [{: x : y &as rect}] (love.graphics.printf text x y w)
+        [x y] (love.graphics.printf text x y 400)
+        )
+      ;; (love.graphics.printf text x y w)
+      )
+    )
+
   (fn setColor [color]
     (tset _G.playdate.graphics :_fg color)
     ;; (love.graphics.setColor color.r color.g color.b (?. color :a))

@@ -7,7 +7,10 @@
       (tset cloned key val))
     cloned))
 
-(defns :basics []
+(defns :basics
+  [ds (require :source.lib.playdate.CoreLibs.datastore)
+   keyboard (require :source.lib.playdate.CoreLibs.keyboard)
+   ]
   (local input-state
          {:timer 0
           :elapsed 0
@@ -345,13 +348,15 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
     (love.graphics.setColor 0.8 0.7 0.2)
     (love.graphics.rectangle "fill" 0 0
                              (* (+ 400 frame.left frame.right) canvas-scale) (* (+ 240 frame.top frame.bottom) canvas-scale))
+    (love.graphics.setColor COLOR_WHITE.r COLOR_WHITE.g COLOR_WHITE.b 1)
+    (love.graphics.rectangle "fill" frame.left frame.top
+                             (* 400 canvas-scale) (* 240 canvas-scale))
     (love.graphics.setLineWidth 8)
     (love.graphics.setColor 0.1 0.1 0.1 1)
     (love.graphics.rectangle "line" frame.left frame.top
                              (* 400 canvas-scale) (* 240 canvas-scale))
     (love.graphics.setColor 1 1 1 1)
     (love.graphics.draw canvas (* frame.left canvas-scale) (* frame.top canvas-scale) 0 canvas-scale)
-    ;; (love.graphics.setColor COLOR_WHITE.r COLOR_WHITE.g COLOR_WHITE.b 1)
 
     (each [i btn (ipairs fake-buttons)]
       (case btn
@@ -400,6 +405,13 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
              :h height :w width
              : insetBy : unpack})
           ))
+
+  (fn getSecondsSinceEpoch []
+    (values (math.floor (love.timer.getTime))
+            (math.floor (* 1000 (love.timer.getTime))))
+    )
+
+  (tset _G.playdate :getSecondsSinceEpoch getSecondsSinceEpoch)
   (tset _G.playdate :drawFPS draw-fps)
   (tset _G.playdate :love-load love-load)
   (tset _G.playdate :love-update love-update)
