@@ -6,21 +6,27 @@
   (?. package.loaded name))
 ;; End patch for missing require
 
-(import-macros {: inspect : pd/import} :source.lib.macros)
+(import-macros {: inspect : pd/import : pd/load : love/patch} :source.lib.macros)
+(love/patch)
 
 (pd/import :CoreLibs/object)
+(pd/import :CoreLibs/easing)
 (pd/import :CoreLibs/graphics)
 (pd/import :CoreLibs/sprites)
 (pd/import :CoreLibs/timer)
-(pd/import :CoreLibs/keyboard)
 
-(global $config {:debug false})
+(global $config {:debug true})
 
-(let [{: scene-manager} (require :source.lib.core)]
-  (scene-manager:load-scenes! (require :source.game.scenes))
-  (scene-manager:select! :logo)
-
-  (fn playdate.update []
-    (scene-manager:tick!)
-    (scene-manager:draw!)))
-
+(pd/load
+ [{: scene-manager} (require :source.lib.core)]
+ (fn load-hook []
+   (scene-manager:load-scenes! (require :source.game.scenes))
+   (scene-manager:select! :logo)
+   )
+ (fn update-hook []
+   (scene-manager:tick!)
+   )
+ (fn draw-hook []
+   (scene-manager:draw!)
+   )
+ )

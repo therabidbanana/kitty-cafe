@@ -1,4 +1,4 @@
-(import-macros {: inspect : defns} :source.lib.macros)
+(import-macros {: inspect : defns : div} :source.lib.macros)
 
 (defns :npc
   [gfx playdate.graphics
@@ -269,7 +269,7 @@
                            :facing :down
                            :state :order
                            :patience (math.random 9 18)
-                           :tile-x (// x tile-w) :tile-y (// y tile-h)})
+                           :tile-x (div x tile-w) :tile-y (div y tile-h)})
       (tile.add! player {: tile-h : tile-w})
       player)))
 

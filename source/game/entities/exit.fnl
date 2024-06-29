@@ -1,4 +1,4 @@
-(import-macros {: inspect : defns} :source.lib.macros)
+(import-macros {: inspect : defns : div} :source.lib.macros)
 
 (defns :exit
   [gfx playdate.graphics
@@ -11,8 +11,8 @@
   ;;   (other:collisionResponse))
 
   (fn new! [x y {: tile-h : tile-w :layer-details {: node-list : grid-w : locations}}]
-    (let [tile-x (// x tile-w)
-          tile-y (// y tile-h)]
+    (let [tile-x (div x tile-w)
+          tile-y (div y tile-h)]
       (tset node-list (+ (* tile-y grid-w) (+ tile-x 1)) 1)
       (tset locations :exit {: tile-x : tile-y})
       nil)))

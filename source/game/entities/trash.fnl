@@ -1,4 +1,4 @@
-(import-macros {: inspect : defns} :source.lib.macros)
+(import-macros {: inspect : defns : div} :source.lib.macros)
 
 (defns trash
   [gfx playdate.graphics
@@ -32,5 +32,5 @@
       (tset player :tile-w tile-w)
       (tset player :interact! interact!)
       (tset player :state {:facing :down
-                           :tile-x (// x tile-w) :tile-y (// y tile-h)})
+                           :tile-x (div x tile-w) :tile-y (div y tile-h)})
       player)))

@@ -1,4 +1,4 @@
-(import-macros {: inspect : defns : pd/import} :source.lib.macros)
+(import-macros {: inspect : defns : pd/import : div} :source.lib.macros)
 
 (defns :source.lib.behaviors.tile-movement
   [gfx playdate.graphics]
@@ -90,16 +90,18 @@
       (tset state :tile-x target-x-tile)
       ;; (tset state :move-y diff-y)
       (tset state :tile-y target-y-tile)
-      (tset self :x (+ (* target-x-tile tile-w) (- (or dx 0))))
-      (tset self :y (+ (* target-y-tile tile-h) (- (or dy 0))))
+      ;; TODO: This was supposed to correct tile misalignment - bounce back
+      ;; but it also causes weirdness
+      ;; (tset self :x (+ (* target-x-tile tile-w) (- (or dx 0))))
+      ;; (tset self :y (+ (* target-y-tile tile-h) (- (or dy 0))))
       (tset state :moving nil)))
 
   (fn add! [item opts]
     (tset item :tile-movement-opts opts)
     (tset item :tile-movement-state {:facing (or opts.default-facing :down) :moving nil
                                      :move-x 0 :move-y 0
-                                     :tile-x (// item.x opts.tile-w)
-                                     :tile-y (// item.y opts.tile-h)
+                                     :tile-x (div item.x opts.tile-w)
+                                     :tile-y (div item.y opts.tile-h)
                                      })
     (tset item :tile-movement-react! tile-movement-react!)
     (tset item :->left! ->left!)
