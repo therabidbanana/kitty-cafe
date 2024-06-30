@@ -117,8 +117,8 @@
       (case rest
         [x y width height radius]
         (love.graphics.rectangle "fill" x y width height radius radius)
-        [{: x : y : width : height} radius]
-        (love.graphics.rectangle "fill" x y width height radius radius)
+        [{: x : y : width : height : h : w} radius]
+        (love.graphics.rectangle "fill" x y (or width w) (or height h) radius radius)
         )
       (love.graphics.pop)
       )
@@ -135,8 +135,8 @@
     (case rest
       [x y width height radius]
       (love.graphics.rectangle "line" x y width height radius radius)
-      [{: x : y : width : height} radius]
-      (love.graphics.rectangle "line" x y width height radius radius)
+      [{: x : y : width : height : w : h} radius]
+      (love.graphics.rectangle "line" x y (or width w) (or height h) radius radius)
       )
     (love.graphics.pop))
 

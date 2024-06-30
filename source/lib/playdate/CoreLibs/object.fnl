@@ -10,7 +10,8 @@
 (defns :basics
   [ds (require :source.lib.playdate.CoreLibs.datastore)
    keyboard (require :source.lib.playdate.CoreLibs.keyboard)
-   ]
+   sound (require :source.lib.playdate.CoreLibs.sound)
+   pathfinder (require :source.lib.playdate.CoreLibs.pathfinder)]
   (local input-state
          {:timer 0
           :elapsed 0
@@ -228,6 +229,10 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
       (love.graphics.print (string.format "%.1f fps" (/ 1000 (* 1000 delta))) 320 10))
     )
 
+  (fn textinput [typed]
+    (if typed
+        (tset playdate.keyboard :text typed)))
+
   (fn keypressed [key]
     (let [mapped (?. input-state :invert-map key)]
       (if mapped
@@ -342,6 +347,7 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
     (love.graphics.clear COLOR_WHITE.r COLOR_WHITE.g COLOR_WHITE.b 1)
     )
   (fn love-draw-end []
+    (keyboard.-maybeDraw)
     (love.graphics.setCanvas)
     (love.graphics.push :all)
     (love.graphics.setShader)
@@ -407,11 +413,16 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
           ))
 
   (fn getSecondsSinceEpoch []
-    (values (math.floor (love.timer.getTime))
+    (values (os.time)
             (math.floor (* 1000 (love.timer.getTime))))
     )
 
+  (fn getCrankChange []
+    "TODO"
+    (values 0 0))
+
   (tset _G.playdate :getSecondsSinceEpoch getSecondsSinceEpoch)
+  (tset _G.playdate :getCrankChange getCrankChange)
   (tset _G.playdate :drawFPS draw-fps)
   (tset _G.playdate :love-load love-load)
   (tset _G.playdate :love-update love-update)
