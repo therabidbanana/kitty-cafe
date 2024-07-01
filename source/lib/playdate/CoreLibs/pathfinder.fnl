@@ -41,6 +41,7 @@
      ;; TODO - A* search, taxicab heuristic
      (fn findPath [self curr goal heuristic]
        (let [heuristic (or heuristic -taxicab)
+             distances {}
              frontier [{:weight (heuristic curr goal)
                         :actual 0
                         :from   nil
@@ -51,12 +52,18 @@
              (if (= next-item.node goal)
                  (set exit next-item)
                  (each [nodeid weight (pairs next-item.node.conns)]
-                   (table.insert frontier {:weight (+ next-item.actual
-                                                      weight
-                                                      (heuristic (self:nodeWithID nodeid) goal))
-                                           :actual (+ weight next-item.actual)
-                                           :from next-item
-                                           :node (self:nodeWithID nodeid)})
+                   (let [actual (+ weight next-item.actual)
+                         step (self:nodeWithID nodeid)]
+                     (if (and step
+                              (< actual (or (?. distances nodeid) math.huge)))
+                         (do
+                           (tset distances nodeid actual)
+                           (table.insert frontier {:weight (+ actual
+                                                              (heuristic step goal))
+                                                   : actual
+                                                   :from next-item
+                                                   :node step}))
+                         ))
                    ))
              (table.sort frontier (fn [a b] (< a.weight b.weight)))
              ))
@@ -65,10 +72,13 @@
                (while exit
                  (table.insert path 1 exit.node)
                  (set exit exit.from))
+               ;; (inspect {:num (length path)
+               ;;           :path (icollect [i p (ipairs path)] p.id)
+               ;;           :source curr})
                path))
          ))
 
-     (fn -xyNodeId [x y w] (+ x (* y w)))
+     (fn -xyNodeId [x y w] (+ x (* (- y 1) w)))
      (fn nodeWithID [self id]
        (?. self.nodes id))
      (fn nodeWithXY [self x y]
@@ -89,33 +99,24 @@
      (fn -adjacentNodeIds [gridx gridy gridw gridh diagonals]
        (let [ids []]
          ;; to the topright
-         (if (and (> gridw gridx)
-                  (> gridy 1)
-                  diagonals)
+         (if (and diagonals (> gridw gridx) (> gridy 1))
              (do
                (table.insert ids (-xyNodeId (+ gridx 1) (- gridy 1) gridw))
                (table.insert ids diagonal))
              )
          ;; to the topleft
-         (if (and (> gridx 1)
-                  (> gridy 1)
-                  diagonals)
+         (if (and diagonals (> gridx 1) (> gridy 1))
              (do
                (table.insert ids (-xyNodeId (- gridx 1) (- gridy 1) gridw))
                (table.insert ids diagonal)))
          ;; to the bottomright
-         (if (and (> gridw gridx)
-                  (> gridh gridy)
-                  diagonals)
+         (if (and diagonals (> gridw gridx) (> gridh gridy))
              (do
                (table.insert ids (-xyNodeId (+ gridx 1) (+ gridy 1) gridw))
                (table.insert ids diagonal))
              )
          ;; to the bottomleft
-         (if (and (> gridx 1)
-                  (> gridh gridy)
-                  diagonals)
-             (> gridh gridy)
+         (if (and diagonals (> gridx 1) (> gridh gridy))
              (do
                (table.insert ids (-xyNodeId (- gridx 1) (+ gridy 1) gridw))
                (table.insert ids diagonal)))
@@ -153,12 +154,12 @@
                     : addConnectionToNodeWithID}
              hasNode (if nodelist
                          (fn [id] (?. nodelist id))
-                         (fn [id] true))
+                         (fn [id] 1))
              ]
          (for [y 1 height]
            (for [x 1 width]
              (let [id (-xyNodeId x y width)]
-               (if (hasNode id)
+               (if (= 1 (hasNode id))
                    (tset nodes id (node.new id x y))))))
          (for [y 1 height]
            (for [x 1 width]

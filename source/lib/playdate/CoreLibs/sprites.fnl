@@ -8,7 +8,7 @@
 
 (defmodule
  _G.playdate.graphics.sprite
- []
+ [bit (require :bit)]
 
  (local sprite-state {:sprites []})
  (fn -contains? [b1 p2]
@@ -21,6 +21,8 @@
         (> (+ b1.y b1.h) b2.y)
         (< b1.y (+ b2.y b2.h))
         ))
+ (fn -inGroups? [collides-with groups]
+   (> (bit.band groups collides-with) 0))
 
  (fn update []
    (each [i sprite (ipairs sprite-state.sprites)]
@@ -43,8 +45,8 @@
    (if self.collisionBox
        (icollect [i sprite (ipairs sprite-state.sprites)]
          (if (= sprite self) nil
-             ;; TODO groups
              (and sprite.collisionBox
+                  (-inGroups? self.collide-mask sprite.group-mask)
                   (-collides? self.collisionBox sprite.collisionBox))
              sprite))
        [])
@@ -138,10 +140,19 @@
    )
 
  (fn setGroups [self list]
+   (var mask 0)
+   (each [i v (ipairs list)]
+     (set mask (+ mask (^ 2 v))))
+   (tset self :group-mask mask)
    (tset self :groups list))
 
  (fn setCollidesWithGroups [self list]
-   (tset self :collideGroups list))
+   (var mask 0)
+   (each [i v (ipairs list)]
+     (set mask (+ mask (^ 2 v))))
+   (tset self :collide-mask mask)
+   (tset self :collideGroups list)
+   )
 
  (local inf math.huge)
  (local -inf (- math.huge))
@@ -232,7 +243,9 @@
            ;; TODO: Add broad phase check (simpler overlap aabb with bigger box)
            (if (= spr self) nil
                ;; Faster aabb
-               (and spr.collisionBox (-collides? moveBox spr.collisionBox))
+               (and spr.collisionBox
+                    (-inGroups? self.collide-mask spr.group-mask)
+                    (-collides? moveBox spr.collisionBox))
                (let [(normx normy collidedt) (-sweptaabb box1 spr.collisionBox dx dy)]
                  ;; TODO - response slide/bounce & ordering multiple?
                  (if (< collidedt 1)
