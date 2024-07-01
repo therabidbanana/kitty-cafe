@@ -29,7 +29,12 @@
      (sprite:update))
    (each [i sprite (ipairs sprite-state.sprites)]
      (if (?. sprite :draw)
-         (sprite:draw sprite.x sprite.y sprite.width sprite.height)))
+         (do
+           (love.graphics.push :all)
+           (love.graphics.translate sprite.x sprite.y)
+           (sprite:draw 0 0 sprite.width sprite.height)
+           ;; (love.graphics.translate 0 0)
+           (love.graphics.pop))))
    )
 
  (fn remove [self]
@@ -69,9 +74,9 @@
  (fn setImage [self image] (tset self :image image))
  (fn instance-update [self] self)
 
- (fn draw [self]
+ (fn draw [self x y]
    (if self.image
-       (self.image:draw self.x self.y))
+       (self.image:draw x y))
    ;; (love.graphics.drawq self.image self.x self.y)
    )
 

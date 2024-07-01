@@ -19,15 +19,18 @@
      _G.playdate.sound.sampleplayer
      []
 
+     (fn stop [self]
+       (self.sound:stop))
+
      (fn play [self]
        (self.sound:play)
        )
 
      (fn new [file]
-       (let [sound (love.audio.newSource (.. file :.ogg) :static)]
-         {: sound : play})
-       )
-     )
+       (let [sound (love.audio.newSource (.. file :.ogg) :static)
+             obj {: sound}]
+         (setmetatable obj {:__index _G.playdate.sound.sampleplayer})
+         obj)))
    )
   (local
    fileplayer
@@ -37,6 +40,9 @@
 
      (fn setVolume [self val]
        (self.sound:setVolume val))
+
+     (fn stop [self]
+       (self.sound:stop))
 
      (fn play [self repeats]
        (if (= repeats 0)

@@ -16,8 +16,8 @@
   (local kColorBlack COLOR_BLACK)
   (local kColorWhite COLOR_WHITE)
   (local kDrawModeCopy "copy")
-  (local kDrawModeFillWhite "fillwhite")
-  (local kDrawModeFillBlack "fillblack")
+  (local kDrawModeFillWhite "fillWhite")
+  (local kDrawModeFillBlack "fillBlack")
   (local _mode kDrawModeCopy)
   (local strings {})
 
