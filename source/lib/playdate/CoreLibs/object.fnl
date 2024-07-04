@@ -33,27 +33,27 @@
           :just-released
           {:a false :b false :up false :down false :left false :right false}
           })
-  (local frame {:top 30 :bottom 320 :left 20 :right 40})
+  (local frame {:top 20 :bottom 20 :left 140 :right 200})
   (local fake-buttons [{:btn :b
-                        :x (+ frame.left 20) :y (+ 240 frame.top 40)
-                        :radius 25
-                        :w 50 :h 50}
+                        :x (- frame.left 130) :y (+ 20 frame.top)
+                        :radius 35
+                        :w 70 :h 70}
                        {:btn :a
-                        :x (+ frame.left 80) :y (+ 240 frame.top 40)
-                        :radius 25
-                        :w 50 :h 50}
+                        :x (- frame.left 80) :y (+ 120 frame.top)
+                        :radius 35
+                        :w 70 :h 70}
                        {:btn :up
-                        :x (+ frame.left 330) :y (+ 240 frame.top 40)
-                        :w 30 :h 50}
+                        :x (+ frame.left 400 80) :y (+ frame.top 10)
+                        :w 50 :h 80}
                        {:btn :down
-                        :x (+ frame.left 330) :y (+ 240 frame.top 140)
-                        :w 30 :h 50}
+                        :x (+ frame.left 400 80) :y (+ frame.top 150)
+                        :w 50 :h 80}
                        {:btn :left
-                        :x (+ frame.left 270) :y (+ 240 frame.top 100)
-                        :w 50 :h 30}
+                        :x (+ frame.left 400 5) :y (+ frame.top 95)
+                        :w 80 :h 50}
                        {:btn :right
-                        :x (+ frame.left 370) :y (+ 240 frame.top 100)
-                        :w 50 :h 30}
+                        :x (+ frame.left 400 125) :y (+ frame.top 95)
+                        :w 80 :h 50}
                        ])
   (local timestamp 0)
   (local canvas (love.graphics.newCanvas 400 240))
