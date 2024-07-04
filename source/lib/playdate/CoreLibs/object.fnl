@@ -68,28 +68,36 @@ extern bool debugDraw;
 extern int pattern[64];
 
 // color constants that match playdate colors
-const vec4 WHITE =        vec4(176.0f / 255.0f, 174.0f / 255.0f, 167.0f / 255.0f, 1);
-const vec4 BLACK =        vec4( 49.0f / 255.0f,  47.0f / 255.0f,  40.0f / 255.0f, 1);
-const vec4 TRANSPARENT =  vec4(0, 0, 0, 0);
-const vec4 DEBUG =        vec4(1, 0, 0, 0.5); // used when rendering via playdate.debugDraw()
+const vec4 WHITE = vec4(176.0 / 255.0, 174.0 / 255.0, 167.0 / 255.0, 1.0);
+const vec4 BLACK = vec4(49.0 / 255.0, 47.0 / 255.0, 40.0 / 255.0, 1.0);
+const vec4 TRANSPARENT = vec4(0.0, 0.0, 0.0, 0.0);
+const vec4 DEBUG = vec4(1.0, 0.0, 0.0, 0.5); // used when rendering via playdate.debugDraw()
+
+
+int getPatternData(int x, int y) {
+    int id = (x + y * 8);
+    for (int i=0; i<32; i++) {
+        if (i == id) return pattern[i];
+    }
+}
 
 vec3 rgb2hsv(vec3 c)
 {
-    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+  vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+  vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+  vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
 
-    float d = q.x - min(q.w, q.y);
-    float e = 1.0e-10;
-    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+  float d = q.x - min(q.w, q.y);
+  float e = 1.0e-10;
+  return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
 vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
 {
   vec4 outputcolor = Texel(tex, tex_coords) * color;
-  if (mode == 1)                          // ---------- fillWhite
+  if (mode == 1) // ---------- fillWhite
   {
-    if (outputcolor.a > 0) 
+    if (outputcolor.a > 0.0)
     {
       if (debugDraw)
       {
@@ -105,9 +113,9 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
       return TRANSPARENT;
     }
   }
-  else if (mode == 2)                     // ---------- fillBlack
+  else if (mode == 2) // ---------- fillBlack
   {
-    if (outputcolor.a > 0) 
+    if (outputcolor.a > 0.0)
     {
       if (debugDraw)
       {
@@ -131,9 +139,9 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
   // {
   //   // TODO: NXOR drawmode
   // }
-  else if (mode == 4)                  // ---------- whitetransparent
+  else if (mode == 4) // ---------- whitetransparent
   {
-    if (outputcolor.a > 0)
+    if (outputcolor.a > 0.0)
     {
       if (debugDraw)
       {
@@ -143,7 +151,7 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
       // choose white or black based on saturation
       float saturation = rgb2hsv(vec3(outputcolor)).z;
       // ideally this value is 0.5f (halfway) not sure why this doesn't work?
-      if (saturation >= 0.45f)
+      if (saturation >= 0.45)
       {
         return TRANSPARENT;
       }
@@ -166,11 +174,11 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
   // {
   //   // TODO: inverted drawmode
   // }
-  else if (mode == 7)                     // ---------- ???
-  {
-    // unused
-  }
-  else if (mode == 8)                     // ---------- pattern
+  // else if (mode == 7) // ---------- ???
+  // {
+  //  // unused
+  // }
+  else if (mode == 8) // ---------- pattern
   {
     // this mode does not exist on PD - this is to implement playdate.graphics.setPattern()
 
@@ -179,7 +187,7 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
     int y = int(mod(screen_coords.y, 8.0));
 
     // Use \"x\" and \"y\" multiplied by \"w\" to index into the pattern array
-    if (pattern[x + y * 8] == 1) {
+    if (getPatternData(x, y) == 1) {
       if (debugDraw)
       {
         return DEBUG;
@@ -192,9 +200,9 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
       return BLACK;
     }
   }
-  else                                    // ---------- copy
+  else // ---------- copy
   {
-    if (outputcolor.a > 0)
+    if (outputcolor.a > 0.0)
     {
       if (debugDraw)
       {
@@ -204,7 +212,7 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
       // choose white or black based on saturation
       float saturation = rgb2hsv(vec3(outputcolor)).z;
       // ideally this value is 0.5f (halfway) not sure why this doesn't work?
-      if (saturation >= 0.45f)
+      if (saturation >= 0.45)
       {
         return WHITE;
       }
@@ -220,6 +228,7 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
     }
   }
 }
+
 "))
 
   (fn draw-fps []
@@ -280,7 +289,10 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
           real-y (/ y canvas-scale)]
       (let [btn (?. input-state.touches id)]
         (if btn
-            (tset input-state :love-press btn false))
+            (do
+              (if _G.playdate.keyboard.keyboard-state.open?
+                  (_G.playdate.keyboard.-closeKeyboard (= btn :a)))
+              (tset input-state :love-press btn false)))
         (tset input-state :touches id nil))
       ))
 

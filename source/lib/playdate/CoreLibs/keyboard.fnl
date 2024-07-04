@@ -55,8 +55,11 @@
          (love.graphics.push :all)
          (love.graphics.setColor 0 0 0 1)
          (love.graphics.rectangle "fill" 240 0 160 240)
-         (love.graphics.setColor 1 1 1 1)
-         (love.graphics.printf "Typing..." 260 20 80)
+         (let [mode (playdate.graphics.getImageDrawMode)]
+           (love.graphics.setColor 1 1 1 1)
+           (playdate.graphics.setImageDrawMode "fillWhite")
+           (love.graphics.printf "Typing..." 260 20 80)
+           (playdate.graphics.setImageDrawMode mode))
          (love.graphics.pop)
          )
        )

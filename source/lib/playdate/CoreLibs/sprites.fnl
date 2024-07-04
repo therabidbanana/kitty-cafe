@@ -8,7 +8,22 @@
 
 (defmodule
  _G.playdate.graphics.sprite
- [bit (require :bit)]
+ [(ok? bit) (pcall require :bit)
+  bit       (if ok?
+                bit
+                {:band (fn bitand [num other]
+                         (var found 0)
+                         (var a num)
+                         (var b other)
+                         (for [i 1 32]
+                           (if (= (% a 2) (% b 2) 1)
+                               (set found (+ found (^ 2 (- i 1)))))
+                           (set a (math.floor (/ a 2)))
+                           (set b (math.floor (/ b 2)))
+                           )
+                         found)})
+  ;; (require :bit)
+  ]
 
  (local sprite-state {:sprites []})
  (fn -contains? [b1 p2]

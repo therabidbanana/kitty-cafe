@@ -20,6 +20,19 @@ win-love-compile: source/**/*.fnl
 win-love-launch: win-love-compile
 	powershell.exe "love source"
 
+win-love-package: win-love-compile
+	powershell.exe -noprofile -command "& {rm ./app.zip}"
+	powershell.exe -noprofile -command "& {rm ./app.love}"
+	powershell.exe "./support/packagelove.ps1"
+	powershell.exe "mv app.zip app.love"
+
+win-love-web: win-love-package
+	powershell.exe "npx love.js.cmd -t Playdate -c .\app.love dist"
+
+win-love-serve: win-love-web
+	powershell.exe "Start-Process powershell.exe 'python -m http.server 8000 -d dist'"
+	powershell.exe "Start-Process 'http://localhost:8000'"
+
 win-build: win-compile
 	powershell.exe "pdc -k source test.pdx"
 	powershell.exe "cp source/*.ldtk test.pdx/"
