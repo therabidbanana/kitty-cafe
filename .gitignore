@@ -4,3 +4,4 @@ source/**.lua
 /.sentry-native/*
 /dist/
 /app.love
+/kitty-cafe.love
