@@ -76,7 +76,7 @@ const vec4 DEBUG = vec4(1.0, 0.0, 0.0, 0.5); // used when rendering via playdate
 
 int getPatternData(int x, int y) {
     int id = (x + y * 8);
-    for (int i=0; i<32; i++) {
+    for (int i=0; i<64; i++) {
         if (i == id) return pattern[i];
     }
 }
