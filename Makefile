@@ -1,26 +1,47 @@
+APP_NAME := kitty-cafe
+
 compile: source/**/*.fnl
 	./support/build.sh
 
 build: compile
-	pdc -k source kitty-cafe.pdx
-	cp source/*.ldtk kitty-cafe.pdx/
+	pdc -k source ${APP_NAME}.pdx
+	cp source/*.ldtk ${APP_NAME}.pdx/
 
 launch: build
-	playdate kitty-cafe.pdx
+	playdate ${APP_NAME}.pdx
 
 clean:
-	rm ./source/main.lua ./kitty-cafe.pdx
+	rm ./source/main.lua ./${APP_NAME}.pdx
 
 win-compile: source/**/*.fnl
 	powershell.exe "./support/build.ps1"
 
+win-love-compile: source/**/*.fnl
+	powershell.exe "./support/buildlove.ps1"
+
+win-love-launch: win-love-compile
+	powershell.exe "love source"
+
+win-love-package: win-love-compile
+	powershell.exe -noprofile -command "& {rm ./app.zip}"
+	powershell.exe -noprofile -command "& {rm ./${APP_NAME}.love}"
+	powershell.exe "./support/packagelove.ps1"
+	powershell.exe "mv app.zip ${APP_NAME}.love"
+
+win-love-web: win-love-package
+	powershell.exe "npx love.js.cmd -t Playdate -c .\${APP_NAME}.love dist"
+
+win-love-serve: win-love-web
+	powershell.exe "Start-Process powershell.exe 'python -m http.server 8000 -d dist'"
+	powershell.exe "Start-Process 'http://localhost:8000'"
+
 win-build: win-compile
-	powershell.exe "pdc -k source kitty-cafe.pdx"
-	powershell.exe "cp source/*.ldtk kitty-cafe.pdx/"
+	powershell.exe "pdc -k source ${APP_NAME}.pdx"
+	powershell.exe "cp source/*.ldtk ${APP_NAME}.pdx/"
 
 win-launch: win-build
-	powershell.exe "playdate kitty-cafe.pdx"
+	powershell.exe "playdate ${APP_NAME}.pdx"
 
 win-clean:
 	powershell.exe -noprofile -command "& {rm ./source/main.lua}"
-	powershell.exe -noprofile -command "& {rm ./kitty-cafe.pdx}"
+	powershell.exe -noprofile -command "& {rm ./${APP_NAME}.pdx}"

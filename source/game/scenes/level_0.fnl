@@ -1,4 +1,4 @@
-(import-macros {: pd/import : clamp : defns : inspect} :source.lib.macros)
+(import-macros {: pd/import : clamp : defns : inspect : div} :source.lib.macros)
 (import-macros {: deflevel} :source.lib.ldtk.macros)
 
 (deflevel :level_0
@@ -20,8 +20,8 @@
     (let [
           music-loop (playdate.sound.fileplayer.new :assets/sounds/8bit-bossa-nova)
           tile-size 16
-          grid-w (// level_0.w tile-size)
-          grid-h (// level_0.h tile-size)
+          grid-w (div level_0.w tile-size)
+          grid-h (div level_0.h tile-size)
           node-list (-node-list! (* grid-w grid-h))
           locations {}
           patrons []
@@ -75,7 +75,7 @@
               cranked (+ (or $.state.cranked 0) acceleratedChange)
               cranked (clamp 0 cranked 960) ;; 3x is fastest without bugging move
               speed (or $.state.speed 1)
-              speed (clamp 1 (+ 1 (// cranked 360)) 3)
+              speed (clamp 1 (+ 1 (div cranked 360)) 3)
               seconds  (+ (* speed 2) $.state.seconds)]
           (tset $ :state :ticks (+ $.state.ticks 1))
           (tset $ :state :seconds seconds)

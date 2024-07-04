@@ -1,4 +1,4 @@
-(import-macros {: inspect : defns} :source.lib.macros)
+(import-macros {: inspect : defns : div} :source.lib.macros)
 
 ;; TODO: rename 'register'
 (defns :order
@@ -9,7 +9,7 @@
    ]
 
   (fn interact! [self player]
-    (let [facing-x (+ self.x (// self.width 2))
+    (let [facing-x (+ self.x (div self.width 2))
           facing-y (+ self.y (+ self.height 8))
           [facing-sprite & _] (icollect [_ spr (ipairs (gfx.sprite.querySpritesAtPoint facing-x facing-y))]
                                 (if (?. spr :interact!) spr nil))]
@@ -34,6 +34,6 @@
       (tset player :tile-w tile-w)
       (tset player :interact! interact!)
       (tset player :state {:facing :down
-                           :tile-x (// x tile-w) :tile-y (// y tile-h)})
+                           :tile-x (div x tile-w) :tile-y (div y tile-h)})
       player)))
 

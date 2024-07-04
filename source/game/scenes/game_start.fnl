@@ -45,6 +45,10 @@
 
   (fn tick! [{:state {: listview &as state} &as $}]
     ;; (listview:drawInRect 180 20 200 200)
+    (if ($ui:active?) ($ui:tick!))
+    )
+
+  (fn draw! [{:state {: listview} &as $}]
     (let [rect (playdate.geometry.rect.new 10 10
                                            120 20)
           ]
@@ -56,9 +60,6 @@
       (gfx.setColor gfx.kColorBlack)
       (gfx.drawText (or (?. playdate :keyboard :text) state.name) 16 12)
       )
-    (if ($ui:active?) ($ui:tick!))
-    )
-  (fn draw! [{:state {: listview} &as $}]
     ($ui:render!)
     ;; (listview:drawInRect 180 20 200 200)
     )

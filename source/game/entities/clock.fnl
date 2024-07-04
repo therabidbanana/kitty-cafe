@@ -1,4 +1,4 @@
-(import-macros {: inspect : defns} :source.lib.macros)
+(import-macros {: inspect : defns : div} :source.lib.macros)
 
 (defns :hud
   [gfx playdate.graphics
@@ -7,7 +7,7 @@
    ]
 
   (fn react! [{:state { : level &as state} &as self}]
-    (let [minutes (// (?. level :state :seconds) 60)
+    (let [minutes (div (?. level :state :seconds) 60)
           minutes (+ minutes 420)] ;; day starts at 7
       (when (not= minutes state.minutes)
         (tset state :minutes minutes)
@@ -21,7 +21,7 @@
     (gfx.setColor gfx.kColorWhite)
     (let [mode (playdate.graphics.getImageDrawMode)]
       (playdate.graphics.setImageDrawMode "fillWhite")
-      (self.tagFont:drawText (.. (string.format "%02d" (// self.state.minutes 60)) " : "
+      (self.tagFont:drawText (.. (string.format "%02d" (div self.state.minutes 60)) " : "
                                  (string.format "%02d" (% self.state.minutes 60))
                                  (if (> self.state.minutes 720) "pm" "am")
                                  )
