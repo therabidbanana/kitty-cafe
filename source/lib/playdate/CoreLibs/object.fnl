@@ -1,5 +1,5 @@
 ; Playdate object helpers and misc
-(import-macros {: defns : div} :source.lib.macros)
+(import-macros {: defns : div : inspect} :source.lib.macros)
 
 (fn table.shallowcopy [orig other]
   (let [cloned (or other {})]
@@ -11,6 +11,7 @@
   [ds (require :source.lib.playdate.CoreLibs.datastore)
    keyboard (require :source.lib.playdate.CoreLibs.keyboard)
    sound (require :source.lib.playdate.CoreLibs.sound)
+   menu (require :source.lib.playdate.CoreLibs.menu)
    pathfinder (require :source.lib.playdate.CoreLibs.pathfinder)]
   (local input-state
          {:timer 0
@@ -33,9 +34,9 @@
           :just-released
           {:a false :b false :up false :down false :left false :right false}
           })
-  (local frame {:top 20 :bottom 20 :left 140 :right 200})
+  (local frame {:top 20 :bottom 20 :left 120 :right 220})
   (local fake-buttons [{:btn :b
-                        :x (- frame.left 130) :y (+ 20 frame.top)
+                        :x (- frame.left 110) :y (+ 20 frame.top)
                         :radius 35
                         :w 70 :h 70}
                        {:btn :a
@@ -43,16 +44,16 @@
                         :radius 35
                         :w 70 :h 70}
                        {:btn :up
-                        :x (+ frame.left 400 80) :y (+ frame.top 10)
+                        :x (+ frame.left 400 88) :y (+ frame.top 5)
                         :w 50 :h 80}
                        {:btn :down
-                        :x (+ frame.left 400 80) :y (+ frame.top 150)
+                        :x (+ frame.left 400 88) :y (+ frame.top 155)
                         :w 50 :h 80}
                        {:btn :left
-                        :x (+ frame.left 400 5) :y (+ frame.top 95)
+                        :x (+ frame.left 400 10) :y (+ frame.top 95)
                         :w 80 :h 50}
                        {:btn :right
-                        :x (+ frame.left 400 125) :y (+ frame.top 95)
+                        :x (+ frame.left 400 135) :y (+ frame.top 95)
                         :w 80 :h 50}
                        ])
   (local timestamp 0)
@@ -303,6 +304,7 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
     (set love.mousereleased mousereleased)
     (set love.touchpressed touchpressed)
     (set love.touchreleased touchreleased)
+    (love.window.setTitle "Playdate Game")
     (love.window.setMode (+ (* 400 canvas-scale) (* (+ frame.left frame.right) canvas-scale))
                          (+ (* 240 canvas-scale) (* (+ frame.top frame.bottom) canvas-scale)))
     ;; (love.graphics.setBackgroundColor COLOR_WHITE.r COLOR_WHITE.g COLOR_WHITE.b 1)
@@ -355,6 +357,8 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
   (fn love-draw-start []
     (love.graphics.clear COLOR_WHITE.r COLOR_WHITE.g COLOR_WHITE.b 1)
     (love.graphics.setCanvas canvas)
+    ;; Early update of offset can get lost (Love requires it in the draw loop)
+    ;; (love.graphics.translate _G.playdate.graphics._tx _G.playdate.graphics._ty)
     ;; TODO - do we always want this?
     (love.graphics.clear COLOR_WHITE.r COLOR_WHITE.g COLOR_WHITE.b 1)
     )
@@ -362,6 +366,7 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
     (keyboard.-maybeDraw)
     (love.graphics.setCanvas)
     (love.graphics.push :all)
+    (love.graphics.origin)
     (love.graphics.setShader)
     (love.graphics.setColor 0.8 0.7 0.2)
     (love.graphics.rectangle "fill" 0 0
@@ -375,25 +380,33 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
                              (* 400 canvas-scale) (* 240 canvas-scale))
     (love.graphics.setColor 1 1 1 1)
     (love.graphics.draw canvas (* frame.left canvas-scale) (* frame.top canvas-scale) 0 canvas-scale)
-
     (each [i btn (ipairs fake-buttons)]
-      (case btn
-        {: radius : x : y : btn}
-        (do (love.graphics.setColor 0.8 0.75 0.3)
-            (love.graphics.circle "fill" (* (+ x radius) canvas-scale) (* (+ y radius) canvas-scale)
-                                  (* radius canvas-scale))
-            (love.graphics.setColor 0.2 0.2 0.3)
-            (love.graphics.printf btn
-                                  (* (+ x (/ radius 2)) canvas-scale)
-                                  (* (+ y (/ radius 2)) canvas-scale)
-                                  radius))
-        {: w : h : x : y : btn}
-        (do (love.graphics.setColor 0.8 0.75 0.3)
-            (love.graphics.rectangle "fill"
-                                     (* x canvas-scale) (* y canvas-scale)
-                                     (* w canvas-scale) (* h canvas-scale))
-            (love.graphics.setColor 0.2 0.2 0.3)
-            ))
+      (let [is-pressed? (. input-state :love-press btn.btn)
+            push-inset (if is-pressed? 1 0)]
+        (case btn
+          {: radius : x : y : btn}
+          (do (love.graphics.setColor 0.2 0.2 0.2)
+              (love.graphics.circle "fill" (* (+ x 1 radius) canvas-scale) (* (+ y 1 radius) canvas-scale)
+                                    (* radius canvas-scale))
+              (love.graphics.setColor 0.8 0.75 0.3)
+              (love.graphics.circle "fill" (* (+ x push-inset radius) canvas-scale) (* (+ y push-inset radius) canvas-scale)
+                                    (* radius canvas-scale))
+              (love.graphics.setColor 0.2 0.2 0.3)
+              (love.graphics.printf btn
+                                    (* (+ x radius -4) canvas-scale)
+                                    (* (+ y radius -8) canvas-scale)
+                                    radius))
+          {: w : h : x : y : btn}
+          (do (love.graphics.setColor 0.2 0.2 0.2)
+              (love.graphics.rectangle "fill"
+                                       (+ 1 (* x canvas-scale)) (+ 1 (* y canvas-scale))
+                                       (* w canvas-scale) (* h canvas-scale))
+              (love.graphics.setColor 0.8 0.75 0.3)
+              (love.graphics.rectangle "fill"
+                                       (+ push-inset (* x canvas-scale)) (+ push-inset (* y canvas-scale))
+                                       (* w canvas-scale) (* h canvas-scale))
+              (love.graphics.setColor 0.2 0.2 0.3)
+              )))
       )
 
     (love.graphics.pop)
@@ -405,6 +418,12 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
         (defns :rect []
           (fn unpack [self]
             (values self.x self.y self.width self.height))
+
+          ;; TODO: handle point as input for x
+          (fn containsPoint [self x y]
+            (and (<= self.x x (+ self.x self.width))
+                 (<= self.y y (+ self.y self.height))
+                 ))
 
           (fn insetBy [self minus-x minus-y]
             (let [minus-y (or minus-y minus-x)
@@ -419,9 +438,10 @@ vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 screen_coords)
               ))
 
           (fn new [x y width height]
-            {: x : y : width : height
-             :h height :w width
-             : insetBy : unpack})
+            (let [new-rect {: x : y : width : height
+                            :h height :w width}]
+              (setmetatable new-rect {:__index _G.playdate.geometry.rect})
+              new-rect))
           ))
 
   (fn getSecondsSinceEpoch []

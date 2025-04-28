@@ -6,7 +6,10 @@
 (if (not (?. _G.playdate :graphics :font))
     (tset _G.playdate :graphics :font {}))
 
-(defmodule _G.playdate.graphics.font []
+(defmodule _G.playdate.graphics.font
+  [
+   love-wrap (require :source.lib.playdate.love-wrap)
+   ]
 
   (fn getHeight [self]
     (self.fnt:getHeight))
@@ -18,12 +21,12 @@
   (fn drawText [self text x y]
     (love.graphics.push :all)
     (love.graphics.setFont self.fnt)
-    (love.graphics.printf text x y (getTextWidth self text))
+    (love-wrap.printf text x y (getTextWidth self text))
     (love.graphics.pop)
     )
 
   (fn new [path]
-    (let [full-path (.. path "BM.fnt")
+    (let [full-path (.. path ".bmfnt")
           fnt (love.graphics.newFont full-path)]
       {: fnt : getHeight : getTextWidth : drawText })
     ))

@@ -23,6 +23,7 @@
                            )
                          found)})
   ;; (require :bit)
+   love-wrap (require :source.lib.playdate.love-wrap)
   ]
 
  (local sprite-state {:sprites []})
@@ -44,12 +45,23 @@
      (sprite:update))
    (each [i sprite (ipairs sprite-state.sprites)]
      (if (?. sprite :draw)
-         (do
-           (love.graphics.push :all)
-           (love.graphics.translate sprite.x sprite.y)
-           (sprite:draw 0 0 sprite.width sprite.height)
-           ;; (love.graphics.translate 0 0)
-           (love.graphics.pop))))
+         (let []
+           (playdate.graphics.pushContext)
+           (if sprite.ignores-offset
+               (do
+                 (playdate.graphics.setDrawOffset sprite.x sprite.y)
+                 (sprite:draw 0 0)
+                 )
+               ;; We want to draw offset if using image
+               (?. sprite :image)
+               (sprite:draw sprite.x sprite.y)
+               (do
+                 (playdate.graphics.setDrawOffset sprite.x sprite.y)
+                 (sprite:draw 0 0)
+                 )
+               )
+           (playdate.graphics.popContext)
+           )))
    )
 
  (fn remove [self]
@@ -59,6 +71,10 @@
 
  (fn removeAll []
    (tset sprite-state :sprites [])
+   )
+
+ (fn getAllSprites []
+   (?. sprite-state :sprites)
    )
 
  (fn overlappingSprites [self]
@@ -84,14 +100,29 @@
    (tset self :width w)
    (tset self :height h))
 
+ (fn getBoundsRect [self]
+   (_G.playdate.geometry.rect.new self.x self.y self.width self.height))
+
  (fn setCenter [self x y] "TODO")
- (fn setSize [self w h] "TODO")
- (fn setImage [self image] (tset self :image image))
+ (fn setSize [self w h] (tset self :width w) (tset self :height h))
+ (fn setIgnoresDrawOffset [self ignores-offset]
+   (tset self :ignores-offset ignores-offset))
+ (fn setImage [self image]
+   (if (not= self.image image)
+       (let [(w h) (image:getSize)]
+         (tset self :width w)
+         (tset self :height h)
+         (tset self :image image)
+         (self:markDirty))))
  (fn instance-update [self] self)
 
+ (fn setVisible [self visible]
+   (tset self :visible visible))
+
  (fn draw [self x y]
-   (if self.image
-       (self.image:draw x y))
+   (if
+    (not self.visible) nil
+    self.image (self.image:draw x y))
    ;; (love.graphics.drawq self.image self.x self.y)
    )
 
@@ -102,7 +133,10 @@
    )
 
  (fn setTilemap [self tilemap]
-   (tset self :image tilemap)
+   (let [(w h) (tilemap:getPixelSize)]
+     (tset self :width w)
+     (tset self :height h)
+     (tset self :image tilemap))
    )
 
  (fn addEmptyCollisionSprite [& rest]
@@ -243,6 +277,13 @@
    (-updateCollisionBox self))
 
  (fn moveWithCollisions [self x y]
+   (let [(new-x new-y collisions count) (self:checkCollisions x y)]
+     ;; (if first-hit (inspect first-hit))
+     (moveTo self new-x new-y)
+     (values new-x new-y collisions count)
+     ))
+
+ (fn checkCollisions [self x y]
    (let [box1 self.collisionBox
          dx (- x self.x)
          dy (- y self.y)
@@ -269,17 +310,23 @@
                (let [(normx normy collidedt) (-sweptaabb box1 spr.collisionBox dx dy)]
                  ;; TODO - response slide/bounce & ordering multiple?
                  (if (< collidedt 1)
-                     {:sprite self.collisionBox :other spr.collisionBox
+                     {:sprite self :other spr
+                      :spriteRect self.collisionBox :otherRect spr.collisionBox
                       :ti collidedt
                       :move {:x (+ (* collidedt dx))
                              :y (+ (* collidedt dy))}
                       :normal {:x normx :y normy}
-                      :type ""})
+                      :type (if (?. self :collisionResponse)
+                                (if (= (type self.collisionResponse) :string)
+                                    self.collisionResponse
+                                    (self:collisionResponse spr))
+                                :freeze)})
                  ))
            )
          count (length collisions)
          _ (table.sort collisions (fn [a b] (< a.ti b.ti)))
-         first-hit (?. collisions 1)
+         actual-collides (icollect [i v (ipairs collisions)] (if (not= v.type :overlap) v))
+         first-hit (?. actual-collides 1)
          new-x (if first-hit
                    (+ self.x first-hit.move.x)
                    x)
@@ -288,12 +335,12 @@
                    y)
          ]
      ;; (if first-hit (inspect first-hit))
-     (moveTo self new-x new-y)
      (values new-x new-y collisions count)
      )
    )
 
- (fn markDirty [] "TODO")
+ (fn markDirty [self]
+   (tset self :dirty true))
 
  (fn moveBy [self dx dy]
    (tset self :x (+ self.x dx))
@@ -305,9 +352,14 @@
    (let [x -800
          y -800
          z-index 0
-         width 0
-         height 0
+         width 1
+         height 1
+         ignores-offset false
+         visible true
+         dirty true
          sprite { : x : y : width : height : z-index : groups
+                  : ignores-offset
+                  : visible : dirty
                   :update instance-update}]
      (setmetatable sprite {:__index _G.playdate.graphics.sprite})
      sprite)
